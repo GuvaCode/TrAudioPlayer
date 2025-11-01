@@ -27,8 +27,6 @@ Universal audio playback component built on **rAudio** (Raylib backend) with mul
 - 🚫 **Single instance**: Only one player per application
 - 🎚️ **EQ restrictions**: Works with ALL players EXCEPT DefaultPlayer
 - 💽 **Bit depth**: 24-bit files auto-converted to 16-bit (quality loss)
-- ⚠️ **Default player**: No equalizer for rAudio backend
-
 
 ## Band Equalizer Frequencies
 
