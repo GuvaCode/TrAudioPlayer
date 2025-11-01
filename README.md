@@ -43,4 +43,4 @@ Universal audio playback component built on **rAudio** (Raylib backend) with mul
 | 8 | 8 kHz | -12dB to +12dB |
 | 9 | 16 kHz | -12dB to +12dB |
 
-
+![Examples](resource/examples.png)

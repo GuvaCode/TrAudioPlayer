@@ -1,0 +1,839 @@
+unit rAudioPlayer;
+
+{$mode ObjFPC}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils, Controls, libraudio,
+  rAudioIntf, ctypes;
+
+type
+  TUsesLibs = (lib_rAudio, lib_ZxTune, lib_VgmPlay, lib_OpenMpt, lib_WavPack, lib_SndFile);
+  TUsesAudioLibs = set of TUsesLibs;
+
+  TPlayFormat = (play_MP3, play_WAV, play_QOA);
+  TrAudioPlayFormat = set of TPlayFormat;
+
+  TPlayerType = (ptUnknown, ptDefault, ptZxTune, ptVgmPlay, ptOpenMpt, ptWavPack, ptSndFile);
+
+  TPlayerTag = record
+    PlayerType: TPlayerType;
+    Title: string;
+    Artist: string;
+    ChipType: string;
+    System: string;
+    Tracker: string;
+    Duration: Integer;
+    TrackCount: Integer;
+  end;
+
+
+const
+  cDefLibs = [lib_rAudio];
+  cDefPlay = [play_MP3, play_WAV, play_QOA];
+
+type
+  { TrAudioPlayer - компонент для воспроизведения аудио }
+  TrAudioPlayer = class(TComponent)
+  private
+    FDefaultFormat: TrAudioPlayFormat;
+    FLibrariesUses: TUsesAudioLibs;
+    FLibrariesPath: string;
+    FTrackInfo: TPlayerTag;
+    FVolume: Single;
+    FMasterVolume: Integer;
+    FTrackLoop: Boolean;
+    FCurrentTrack: Integer;
+    FCurrentFile: String;
+    FTrackCount: Integer;
+    FPlayerState: TPlayerState;
+    FBalance: Integer; // -100 (левый) .. 0 (центр) .. +100 (правый)
+    // События
+    FOnPlay: TPlayEvent;
+    FOnPause: TPauseEvent;
+    FOnStop: TStopEvent;
+    FOnEnd: TEndEvent;
+    FOnError: TErrorEvent;
+    FOnLoad: TLoadEvent;
+
+    // Плееры
+    FDefaultPlayer: IMusicPlayer;
+    FZxTunePlayer:  IMusicPlayer;
+    FVGMPlayer:     IMusicPlayer;
+    FOpenMptPlayer: IMusicPlayer;
+    FWavPackPlayer: IMusicPlayer;
+    FSndFilePlayer: IMusicPlayer;
+    FCurrentPlayer: IMusicPlayer; // текущий плеер
+    // Тип
+    FPlayerEngine: TPlayerType;
+
+    function GetMasterVolume: Integer;
+    procedure SetAudioLibs(AValue: TUsesAudioLibs);
+    procedure SetDefaultFormat(AValue: TrAudioPlayFormat);
+    procedure SetLoopMode(AValue: Boolean);
+    procedure SetMasterVolume(AValue: Integer);
+    procedure SetVolume(Volume: Single);
+    procedure SetOnEnd(AValue: TEndEvent);
+    procedure SetOnError(AValue: TErrorEvent);
+    procedure SetOnPause(AValue: TPauseEvent);
+    procedure SetOnPlay(AValue: TPlayEvent);
+    procedure SetOnStop(AValue: TStopEvent);
+    procedure SetOnLoad(AValue: TLoadEvent);
+
+    // Внутренние методы
+    procedure PlayHandleEvent(Sender: TObject; Track: Integer);
+    procedure PauseHandleEvent(Sender: TObject; Track: Integer);
+    procedure StopHandleEvent(Sender: TObject; Track: Integer);
+    procedure EndHandleEvent(Sender: TObject; Track: Integer; FinishedNormally: Boolean);
+    procedure ErrorHandleEvent(Sender: TObject; const Msg: string);
+    procedure LoadHandleEvent(Sender: TObject; const FileName: string; TrackCount: Integer);
+
+    function GetPlayerState: TPlayerState;
+    function GetCurrentTrack: Integer;
+    function GetCurrentFile: String;
+    function GetTrackCount: Integer;
+    function GetLoopMode: Boolean;
+    function GetVolume: Single;
+
+    // Опредиляем тип плеера
+    function TestRAudio(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
+    function TestSndFile(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
+    function TestWavPack(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
+    function TestOpenMPT(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
+    function TestVGM(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
+    function TestZxTune(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
+
+    function DetectAudioFileType(const AFileName: string): TPlayerTag;
+        // Методы для баланса
+    procedure SetBalance(AValue: Integer);
+    function GetBalance: Integer;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    // Инициализация и загрузка библиотек
+    procedure InitializePlayers;
+
+    // Основные методы
+    procedure OpenMusicFile(const MusicFile: String);
+    procedure Play;
+    procedure PlayTrack(Track: Integer);
+    procedure Pause;
+    procedure Resume;
+    procedure Stop;
+
+    // Позиция
+    procedure SetPosition(PositionMs: Integer);
+    function GetPosition: Integer;
+    function GetDuration: Integer;
+    // Состояние
+    function IsPlaying: Boolean;
+    function IsPaused: Boolean;
+    function IsStopped: Boolean;
+    function GetState: TPlayerState;
+
+    // Управление эквалайзером
+    procedure SetEqualizerBand(BandIndex: Integer; Gain: Single);
+    function GetEqualizerBand(BandIndex: Integer): Single;
+    procedure ResetEqualizer;
+
+    // Информация о треке
+    property CurrentTrack: Integer read GetCurrentTrack;
+    property CurrentFile: String read GetCurrentFile;
+    property TrackCount: Integer read GetTrackCount;
+    property TrackInfo: TPlayerTag read FTrackInfo;
+    // Информация о движке
+    function GetCurrentEngine: String;
+
+    // Свойства
+    property TrackNumber: Integer read GetCurrentTrack write PlayTrack;
+    property State: TPlayerState read GetPlayerState;
+    property LoopMode: Boolean read GetLoopMode write SetLoopMode;
+    property Volume: Single read GetVolume write SetVolume;
+    property MasterVolume: Integer read GetMasterVolume write SetMasterVolume;
+
+    // Свойства эквалайзера
+    property EqualizerBand[BandIndex: Integer]: Single read GetEqualizerBand write SetEqualizerBand;
+    property Balance: Integer read GetBalance write SetBalance;
+  published
+    property LibrariesPath: string read FLibrariesPath write FLibrariesPath;
+    property LibrariesUses: TUsesAudioLibs read FLibrariesUses write SetAudioLibs default cDefLibs;
+    property DefaultFormat: TrAudioPlayFormat read FDefaultFormat write SetDefaultFormat default cDefPlay;
+
+    // События
+    property OnPlay: TPlayEvent read FOnPlay write SetOnPlay;
+    property OnPause: TPauseEvent read FOnPause write SetOnPause;
+    property OnStop: TStopEvent read FOnStop write SetOnStop;
+    property OnEnd: TEndEvent read FOnEnd write SetOnEnd;
+    property OnError: TErrorEvent read FOnError write SetOnError;
+    property OnLoad: TLoadEvent read FOnLoad write SetOnLoad;
+
+  end;
+
+procedure Register;
+
+implementation
+
+uses
+  Math,
+  DefaultAudioPlayer,
+  ZxTuneAudioPlayer,
+  VgmAudioPlayer,
+  OpenMptAudioPlayer,
+  WavPackAudioPlayer,
+  SndFileAudioPlayer,
+  LResources, libzxtune, libvgmplay, libOpenMpt, libWavPack, libSndFile;
+
+procedure Register;
+begin
+  {$I ../package/raudio_icon.lrs}
+  RegisterComponents('Audio', [TrAudioPlayer]);
+end;
+
+{ TrAudioPlayer }
+
+constructor TrAudioPlayer.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+
+  // Инициализация свойств
+  FLibrariesUses := cDefLibs;
+  FDefaultFormat := [play_MP3, play_WAV, play_QOA]; // Явно указываем значения
+  FVolume := 1.0;
+  FTrackLoop := False;
+  FCurrentTrack := 0;
+  FPlayerState := psStopped;
+  FPlayerEngine := ptUnknown;
+  FBalance := 0; // Центр по умолчанию
+  // Инициализация записи
+  FTrackInfo.PlayerType := ptUnknown;
+  FTrackInfo.Title := '';
+  FTrackInfo.Artist := '';
+  FTrackInfo.ChipType := '';
+  FTrackInfo.System := '';
+  FTrackInfo.Tracker := '';
+  FTrackInfo.Duration := 0;
+  FTrackInfo.TrackCount := 0;
+
+  // Явная инициализация событий (важно для Lazarus)
+  FOnPlay := nil;
+  FOnPause := nil;
+  FOnStop := nil;
+  FOnEnd := nil;
+  FOnError := nil;
+  FOnLoad := nil;
+end;
+
+destructor TrAudioPlayer.Destroy;
+begin
+  Stop;
+  inherited Destroy;
+end;
+
+procedure TrAudioPlayer.OpenMusicFile(const MusicFile: String);
+begin
+  if not FileExists(MusicFile) then
+  begin
+    if Assigned(FOnError) then
+      FOnError(Self, 'File not found: ' + MusicFile);
+    Exit;
+  end;
+
+  FTrackInfo := DetectAudioFileType(MusicFile);
+
+  // Устанавливаем тип плеера на основе результата детектирования
+  FPlayerEngine := FTrackInfo.PlayerType;
+
+  Stop;
+
+  // Выбираем подходящий плеер
+  case FPlayerEngine of
+    ptZxTune:
+      begin
+        if (lib_ZxTune in FLibrariesUses) and Assigned(FZxTunePlayer) then
+          FCurrentPlayer := FZxTunePlayer
+        else
+          FCurrentPlayer := FDefaultPlayer;
+      end;
+
+    ptVgmPlay:
+      begin
+        if (lib_VgmPlay in FLibrariesUses) and Assigned(FVGMPlayer) then
+          FCurrentPlayer := FVGMPlayer
+        else
+          FCurrentPlayer := FDefaultPlayer;
+      end;
+
+    ptOpenMpt:
+      begin
+        if (lib_OpenMpt in FLibrariesUses) and Assigned(FOpenMptPlayer) then
+          FCurrentPlayer := FOpenMptPlayer
+        else
+          FCurrentPlayer := FDefaultPlayer;
+      end;
+
+    ptWavPack:
+      begin
+        if (lib_WavPack in FLibrariesUses) and Assigned(FWavPackPlayer) then
+          FCurrentPlayer := FWavPackPlayer
+        else
+          FCurrentPlayer := FDefaultPlayer;
+      end;
+
+    ptSndFile:
+      begin
+        if (lib_SndFile in FLibrariesUses) and Assigned(FSndFilePlayer) then
+          FCurrentPlayer := FSndFilePlayer
+        else
+          FCurrentPlayer := FDefaultPlayer;
+      end;
+
+    else
+      FCurrentPlayer := FDefaultPlayer;
+  end;
+
+  if Assigned(FCurrentPlayer) then
+  begin
+    // Загружаем файл
+    if FPlayerEngine <> ptUnknown then
+      FCurrentPlayer.OpenMusicFile(MusicFile);
+    FCurrentFile := MusicFile;
+    FCurrentTrack := 0;
+    FPlayerState := psStopped;
+
+    // Устанавливаем режим повтора
+    FCurrentPlayer.SetLoopMode(FTrackLoop);
+  end
+  else if Assigned(FOnError) then
+  begin
+    FOnError(Self, 'No suitable player found for: ' + MusicFile);
+  end;
+end;
+
+procedure TrAudioPlayer.Play;
+begin
+  if Assigned(FCurrentPlayer) then
+  begin
+    FCurrentPlayer.Play;
+    FPlayerState := psPlaying;
+  end
+  else if Assigned(FOnError) then
+  begin
+    FOnError(Self, 'No music file loaded');
+  end;
+end;
+
+procedure TrAudioPlayer.PlayTrack(Track: Integer);
+begin
+  if Assigned(FCurrentPlayer) then
+  begin
+    FCurrentPlayer.TrackNumber := Track;
+    Play;
+    FCurrentTrack := Track;
+  end;
+end;
+
+procedure TrAudioPlayer.Pause;
+begin
+  if Assigned(FCurrentPlayer) then
+  begin
+    FCurrentPlayer.Pause;
+    FPlayerState := psPaused;
+  end;
+end;
+
+procedure TrAudioPlayer.Resume;
+begin
+  if Assigned(FCurrentPlayer) then
+  begin
+    FCurrentPlayer.Resume;
+    FPlayerState := psPlaying;
+  end;
+end;
+
+procedure TrAudioPlayer.Stop;
+begin
+  if Assigned(FCurrentPlayer) then
+  begin
+    FCurrentPlayer.Stop;
+    FPlayerState := psStopped;
+  end;
+end;
+
+procedure TrAudioPlayer.SetAudioLibs(AValue: TUsesAudioLibs);
+begin
+  // lib_rAudio всегда включен
+  if not (lib_rAudio in AValue) then
+    Include(AValue, lib_rAudio);
+
+  if FLibrariesUses = AValue then
+    Exit;
+
+  FLibrariesUses := AValue;
+end;
+
+function TrAudioPlayer.GetMasterVolume: Integer;
+var
+  VolumeFloat: Single;
+begin
+  VolumeFloat := librAudio.GetMasterVolume();
+  // Ограничиваем диапазон и конвертируем в проценты
+  VolumeFloat := EnsureRange(VolumeFloat, 0.0, 1.0);
+  Result := Round(VolumeFloat * 100);
+  FMasterVolume := Result;
+end;
+
+procedure TrAudioPlayer.SetDefaultFormat(AValue: TrAudioPlayFormat);
+begin
+  if FDefaultFormat=AValue then Exit;
+  FDefaultFormat:=AValue;
+end;
+
+procedure TrAudioPlayer.SetLoopMode(AValue: Boolean);
+begin
+  FTrackLoop := AValue;
+
+  if Assigned(FCurrentPlayer) then
+    FCurrentPlayer.SetLoopMode(FTrackLoop);
+end;
+
+procedure TrAudioPlayer.SetMasterVolume(AValue: Integer);
+begin
+  if FMasterVolume = AValue then Exit;
+  // Ограничиваем диапазон 0-100
+  FMasterVolume := EnsureRange(AValue, 0, 100);
+  // Конвертируем в 0.0-1.0 и устанавливаем в библиотеку
+  librAudio.SetMasterVolume(FMasterVolume / 100.0);
+end;
+
+procedure TrAudioPlayer.SetOnEnd(AValue: TEndEvent);
+begin
+  FOnEnd := AValue;
+end;
+
+procedure TrAudioPlayer.SetOnError(AValue: TErrorEvent);
+begin
+  FOnError := AValue;
+end;
+
+procedure TrAudioPlayer.SetOnPause(AValue: TPauseEvent);
+begin
+  FOnPause := AValue;
+end;
+
+procedure TrAudioPlayer.SetOnPlay(AValue: TPlayEvent);
+begin
+  FOnPlay := AValue;
+end;
+
+procedure TrAudioPlayer.SetOnStop(AValue: TStopEvent);
+begin
+  FOnStop := AValue;
+end;
+
+procedure TrAudioPlayer.SetOnLoad(AValue: TLoadEvent);
+begin
+  FOnLoad := AValue;
+end;
+
+procedure TrAudioPlayer.InitializePlayers;
+begin
+  // Загружаем библиотеки
+  if lib_rAudio in FLibrariesUses then
+  begin
+    libraudio.LoadLib_rAudio(FindLibName(FLibrariesPath, libraudio.library_name));
+    if not rAudioLoaded then
+    begin
+      if Assigned(FOnError) then
+        FOnError(Self, 'Failed to load rAudio library: ' + libraudio.library_name);
+      raise Exception.Create('Failed to load rAudio library: ' + libraudio.library_name);
+      Exit;
+    end;
+  end;
+
+  if lib_zxTune in FLibrariesUses then
+  begin
+    LoadZXTuneLibrary(FindLibName(FLibrariesPath, libzxtune.DEFAULT_LIB_NAME));
+    if not ZXTuneLoaded then
+    begin
+      if Assigned(FOnError) then
+        FOnError(Self, 'Failed to load ZxTune library: ' + libzxtune.DEFAULT_LIB_NAME);
+      raise Exception.Create('Failed to load ZxTune library: ' + libzxtune.DEFAULT_LIB_NAME);
+      Exit;
+    end;
+  end;
+
+  if lib_vgmPlay in FLibrariesUses then
+  begin
+    LoadVGMLibrary(FindLibName(FLibrariesPath, libvgmplay.VGMLIB_NAME));
+    if not VGMLoaded then
+    begin
+      if Assigned(FOnError) then
+        FOnError(Self, 'Failed to load VGMPlay library: ' + libvgmplay.VGMLIB_NAME);
+      raise Exception.Create('Failed to load VGMPlay library: ' + libvgmplay.VGMLIB_NAME);
+      Exit;
+    end;
+  end;
+
+  if lib_OpenMpt in FLibrariesUses then
+  begin
+    LoadMptLib(FindLibName(FLibrariesPath, libopenmpt.library_name));
+    if not LibOpenMptLoaded then
+    begin
+      if Assigned(FOnError) then
+        FOnError(Self, 'Failed to load OpenMPT library: ' + libopenmpt.library_name);
+      raise Exception.Create('Failed to load OpenMPT library: ' + libopenmpt.library_name);
+      Exit;
+    end;
+  end;
+
+  if lib_WavPack in FLibrariesUses then
+  begin
+    LoadWavPackLibrary(FindLibName(FLibrariesPath, libwavpack.DEFAULT_LIB_NAME));
+    if not WavPackLoaded then
+    begin
+      if Assigned(FOnError) then
+        FOnError(Self, 'Failed to load WavPack library: ' + libwavpack.DEFAULT_LIB_NAME);
+      raise Exception.Create('Failed to load WavPack library: ' + libwavpack.DEFAULT_LIB_NAME);
+      Exit;
+    end;
+  end;
+
+  if lib_SndFile in FLibrariesUses then
+  begin
+    sf_Load(FindLibName(FLibrariesPath, libsndfile.libsf));
+    if not sf_IsLoaded then
+    begin
+      if Assigned(FOnError) then
+        FOnError(Self, 'Failed to load SndFile library: ' + libsndfile.libsf);
+      raise Exception.Create('Failed to load SndFile library: ' + libsndfile.libsf);
+      Exit;
+    end;
+  end;
+
+  InitAudioDevice;
+
+  // Инициализация Default плеера
+  FDefaultPlayer := TDefaultAudioPlayer.Create;
+  FDefaultPlayer.OnPlay := @PlayHandleEvent;
+  FDefaultPlayer.OnStop := @StopHandleEvent;
+  FDefaultPlayer.OnPause := @PauseHandleEvent;
+  FDefaultPlayer.OnEnd := @EndHandleEvent;
+  FDefaultPlayer.OnError := @ErrorHandleEvent;
+  FDefaultPlayer.OnLoad := @LoadHandleEvent;
+
+  // Инициализация ZxTune плеера (только если библиотека доступна)
+  if lib_ZxTune in FLibrariesUses then
+  begin
+    FZxTunePlayer := TZxTuneAudioPlayer.Create;
+    FZxTunePlayer.OnPlay := @PlayHandleEvent;
+    FZxTunePlayer.OnStop := @StopHandleEvent;
+    FZxTunePlayer.OnPause := @PauseHandleEvent;
+    FZxTunePlayer.OnEnd := @EndHandleEvent;
+    FZxTunePlayer.OnError := @ErrorHandleEvent;
+    FZxTunePlayer.OnLoad := @LoadHandleEvent;
+  end;
+
+  // Инициализация Vgm плеера (только если библиотека доступна)
+  if lib_VgmPlay in FLibrariesUses then
+  begin
+    FVGMPlayer := TVGMAudioPlayer.Create;
+    FVGMPlayer.OnPlay := @PlayHandleEvent;
+    FVGMPlayer.OnStop := @StopHandleEvent;
+    FVGMPlayer.OnPause := @PauseHandleEvent;
+    FVGMPlayer.OnEnd := @EndHandleEvent;
+    FVGMPlayer.OnError := @ErrorHandleEvent;
+    FVGMPlayer.OnLoad := @LoadHandleEvent;
+  end;
+
+  if lib_OpenMpt in FLibrariesUses then
+  begin
+    FOpenMptPlayer := TOpenMPTAudioPlayer.Create;
+    FOpenMptPlayer.OnPlay := @PlayHandleEvent;
+    FOpenMptPlayer.OnStop := @StopHandleEvent;
+    FOpenMptPlayer.OnPause := @PauseHandleEvent;
+    FOpenMptPlayer.OnEnd := @EndHandleEvent;
+    FOpenMptPlayer.OnError := @ErrorHandleEvent;
+    FOpenMptPlayer.OnLoad := @LoadHandleEvent;
+  end;
+
+  if lib_WavPack in FLibrariesUses then
+  begin
+    FWavPackPlayer := TWavPackAudioPlayer.Create;
+    FWavPackPlayer.OnPlay := @PlayHandleEvent;
+    FWavPackPlayer.OnStop := @StopHandleEvent;
+    FWavPackPlayer.OnPause := @PauseHandleEvent;
+    FWavPackPlayer.OnEnd := @EndHandleEvent;
+    FWavPackPlayer.OnError := @ErrorHandleEvent;
+    FWavPackPlayer.OnLoad := @LoadHandleEvent;
+  end;
+
+  if lib_SndFile in FLibrariesUses then
+  begin
+    FSndFilePlayer := TSndFileAudioPlayer.Create;
+    FSndFilePlayer.OnPlay := @PlayHandleEvent;
+    FSndFilePlayer.OnStop := @StopHandleEvent;
+    FSndFilePlayer.OnPause := @PauseHandleEvent;
+    FSndFilePlayer.OnEnd := @EndHandleEvent;
+    FSndFilePlayer.OnError := @ErrorHandleEvent;
+    FSndFilePlayer.OnLoad := @LoadHandleEvent;
+  end;
+
+  FCurrentPlayer := FDefaultPlayer; // По умолчанию
+end;
+
+procedure TrAudioPlayer.PlayHandleEvent(Sender: TObject; Track: Integer);
+begin
+  FCurrentTrack := Track;
+  FPlayerState := psPlaying;
+  if Assigned(FOnPlay) then
+    FOnPlay(Self, Track);
+end;
+
+procedure TrAudioPlayer.PauseHandleEvent(Sender: TObject; Track: Integer);
+begin
+  FPlayerState := psPaused;
+  if Assigned(FOnPause) then
+    FOnPause(Self, Track);
+end;
+
+procedure TrAudioPlayer.StopHandleEvent(Sender: TObject; Track: Integer);
+begin
+  FPlayerState := psStopped;
+  if Assigned(FOnStop) then
+    FOnStop(Self, Track);
+end;
+
+procedure TrAudioPlayer.EndHandleEvent(Sender: TObject; Track: Integer; FinishedNormally: Boolean);
+begin
+  FPlayerState := psStopped;
+  if Assigned(FOnEnd) then
+    FOnEnd(Self, Track, FinishedNormally);
+end;
+
+procedure TrAudioPlayer.ErrorHandleEvent(Sender: TObject; const Msg: string);
+begin
+  if Assigned(FOnError) then
+    FOnError(Self, Msg);
+end;
+
+procedure TrAudioPlayer.LoadHandleEvent(Sender: TObject; const FileName: string; TrackCount: Integer);
+begin
+  FTrackCount := TrackCount;
+  if Assigned(FOnLoad) then
+    FOnLoad(Self, FileName, TrackCount);
+end;
+
+function TrAudioPlayer.GetPlayerState: TPlayerState;
+begin
+  Result := FPlayerState;
+end;
+
+procedure TrAudioPlayer.SetVolume(Volume: Single);
+begin
+  FVolume := Volume;
+end;
+
+function TrAudioPlayer.GetVolume: Single;
+begin
+  Result := FVolume;
+end;
+
+// Методы управления эквалайзером
+procedure TrAudioPlayer.SetEqualizerBand(BandIndex: Integer; Gain: Single);
+begin
+  if Assigned(FCurrentPlayer)  then
+    FCurrentPlayer.SetEqualizerBand(BandIndex, Gain);
+end;
+
+function TrAudioPlayer.GetEqualizerBand(BandIndex: Integer): Single;
+begin
+  if Assigned(FCurrentPlayer) then
+    Result := FCurrentPlayer.GetEqualizerBand(BandIndex)
+  else
+    Result := 0.0;
+end;
+
+procedure TrAudioPlayer.ResetEqualizer;
+begin
+  if Assigned(FCurrentPlayer) then
+    FCurrentPlayer.ResetEqualizer;
+end;
+
+
+// Проверка rAudio
+{$I includes/TestRaudio.inc}
+// Проверка SndFile
+{$I includes/TestSndFile.inc}
+// Проверка WavPack
+{$I includes/TestWavPack.inc}
+// Проверка OpenMpt
+{$I includes/TestOpenMPT.inc}
+// Проверка VGM
+{$I includes/TestVgm.inc}
+// Проверка Zx Spectrum форматов
+{$I includes/TestZxTune.inc}
+
+procedure TrAudioPlayer.SetPosition(PositionMs: Integer);
+begin
+  if Assigned(FCurrentPlayer) then
+    FCurrentPlayer.SetPosition(PositionMs);
+end;
+
+function TrAudioPlayer.GetPosition: Integer;
+begin
+  if Assigned(FCurrentPlayer) then
+    Result := FCurrentPlayer.GetPosition
+  else
+    Result := 0;
+end;
+
+function TrAudioPlayer.GetDuration: Integer;
+begin
+  if Assigned(FCurrentPlayer) then
+    Result := FCurrentPlayer.GetDuration
+  else
+    Result := 0;
+end;
+
+function TrAudioPlayer.GetLoopMode: Boolean;
+begin
+  if Assigned(FCurrentPlayer) then
+    Result := FCurrentPlayer.GetLoopMode
+  else
+    Result := False;
+end;
+
+function TrAudioPlayer.IsPlaying: Boolean;
+begin
+  Result := FPlayerState = psPlaying;
+end;
+
+function TrAudioPlayer.IsPaused: Boolean;
+begin
+  Result := FPlayerState = psPaused;
+end;
+
+function TrAudioPlayer.IsStopped: Boolean;
+begin
+  Result := FPlayerState = psStopped;
+end;
+
+function TrAudioPlayer.GetState: TPlayerState;
+begin
+  Result := FPlayerState;
+end;
+
+function TrAudioPlayer.GetCurrentTrack: Integer;
+begin
+  if Assigned(FCurrentPlayer) then
+    Result := FCurrentPlayer.GetCurrentTrack
+  else
+    Result := FCurrentTrack;
+end;
+
+function TrAudioPlayer.GetCurrentFile: String;
+begin
+  Result := FCurrentFile;
+end;
+
+function TrAudioPlayer.GetTrackCount: Integer;
+begin
+  if Assigned(FCurrentPlayer) then
+    Result := FCurrentPlayer.GetTrackCount
+  else
+    Result := FTrackCount;
+end;
+
+function TrAudioPlayer.DetectAudioFileType(const AFileName: string): TPlayerTag;
+begin
+  result.PlayerType := ptDefault;
+  result.Title := '';
+  result.Artist := '';
+  result.ChipType := '';
+  result.System := '';
+  result.Tracker := '';
+  result.Duration := 0;
+  result.TrackCount := 0;
+
+  try
+    if (lib_rAudio in FLibrariesUses) then
+    begin
+      if TestRAudio(AFileName, Result) then
+        Exit;
+    end;
+
+    if (lib_Zxtune in FLibrariesUses) then
+    begin
+      if TestZxTune(AFileName, Result) then Exit;
+    end;
+
+    if (lib_VgmPlay in FLibrariesUses) then
+    begin
+      if TestVgm(AFileName, Result) then
+        Exit;
+    end;
+
+    if (lib_OpenMPT in FLibrariesUses) then
+    begin
+      if TestOpenMPT(AFileName, Result) then
+        Exit;
+    end;
+
+    if (lib_SndFile in FLibrariesUses) then
+    begin
+      if TestSndFile(AFileName, Result) then
+        Exit;
+    end;
+
+    if (lib_WavPack in FLibrariesUses) then
+    begin
+      if TestWavPAck(AFileName, Result) then
+        Exit;
+    end;
+
+  except
+    on E: Exception do
+      Result.PlayerType := ptUnknown;
+  end;
+end;
+
+procedure TrAudioPlayer.SetBalance(AValue: Integer);
+begin
+  // Ограничиваем значение от -100 до +100
+   FBalance := Max(-100, Min(100, AValue));
+
+   // Преобразуем Integer (-100..+100) в Single (-1.0..+1.0) для плеера
+   if Assigned(FCurrentPlayer) then
+     FCurrentPlayer.SetBalance(FBalance / 100.0);
+end;
+
+function TrAudioPlayer.GetBalance: Integer;
+begin
+  if Assigned(FCurrentPlayer) then
+  begin
+    // Получаем Single от плеера и преобразуем обратно в Integer
+    FBalance := Round(FCurrentPlayer.GetBalance * 100);
+    Result := FBalance;
+  end
+  else
+    Result := FBalance;
+end;
+
+function TrAudioPlayer.GetCurrentEngine: String;
+begin
+  case FPlayerEngine of
+    ptUnknown:  Result := 'UNSUPPORTED - No available decoder for this format';
+    ptDefault:  Result := 'rAudio - Primary engine for basic formats';
+    ptZxTune:   Result := 'ZXTune - Retro chiptune and console music';
+    ptVgmPlay:  Result := 'VGMPlay - Arcade and console sound chips';
+    ptOpenMpt:  Result := 'OpenMPT - Amiga and DOS tracker modules';
+    ptWavPack:  Result := 'WavPack - Hybrid lossless audio';
+    ptSndFile:  Result := 'LibSndFile - Universal format support';
+  else
+    Result := 'rAudio - Default audio backend';
+  end;
+end;
+
+end.
