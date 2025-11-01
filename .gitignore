@@ -40,11 +40,11 @@
 
 # Delphi compiler-generated binaries (safe to delete)
 *.exe
-*.dll
+#*.dll
 *.bpl
 *.bpi
 *.dcp
-*.so
+#*.so
 *.apk
 *.drc
 *.map
@@ -53,7 +53,7 @@
 *.tds
 *.dcu
 *.lib
-*.a
+#*.a
 *.o
 *.ocx
 
