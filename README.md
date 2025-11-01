@@ -6,7 +6,7 @@ Universal audio playback component built on **rAudio** (Raylib backend) with mul
 ## Key Features
 
 - 🎵 **Multi-format**: MP3, WAV, QOA via rAudio + ZxTune, VGMPlay, OpenMPT, WavPack, LibSndFile
-- 🎛️ **band EQ**: Professional equalizer (all players EXCEPT default player)
+- 🎛️ **band EQ**: Professional equalizer (all players EXCEPT default player(rAudio) )
 - 🔧 **Extensible**: Add custom players via `IMusicPlayer` interface
 - 🔄 **Auto-conversion**: 24-bit → 16-bit for compatibility
 - 📱 **Cross-platform**: Windows, Linux
