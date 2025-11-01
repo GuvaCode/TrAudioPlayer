@@ -17,7 +17,7 @@ Universal audio playback component built on **rAudio** (Raylib backend) with mul
 |---------|---------|-----------|
 | rAudio (Default) | MP3, WAV, QOA, OGG, FLAC | ❌ Not supported |
 | ZxTune | ZX Spectrum, Amiga, Atari | ✅ Supported |
-| VGMPlay | VGM, SPC, NSF, GYM | ✅ Supported |
+| VGMPlay | VGM | ✅ Supported |
 | OpenMPT | MOD, XM, IT, S3M | ✅ Supported |
 | WavPack | WV (lossless) | ✅ Supported |
 | LibSndFile | 40+ formats incl. AIFF, AU | ✅ Supported |

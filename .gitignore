@@ -37,9 +37,12 @@
 #Android64/
 #iOSDevice64/
 #Linux64/
+examples/simple_player/lib/x86_64-linux
 
 # Delphi compiler-generated binaries (safe to delete)
 *.exe
+*.compiled
+*.ppu
 #*.dll
 *.bpl
 *.bpi
