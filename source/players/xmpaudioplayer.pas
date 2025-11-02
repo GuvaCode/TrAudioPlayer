@@ -158,6 +158,9 @@ end;
 
 destructor TXmpAudioPlayer.Destroy;
 begin
+   StopAudioStream(FStream);
+//  SetAudioStreamCallback(FStream, @AudioCallback);
+  DetachAudioMixedProcessor(@AudioProcessEqualizer);
   InternalStop;
   FreeModuleData;
   FPositionLock.Free;

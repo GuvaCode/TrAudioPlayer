@@ -452,7 +452,7 @@ initialization
  // LoadLib(FindLibName(XMP_LIB_NAME));
 
 finalization
- // if library_handle <> NilHandle then
+  //if library_handle <> NilHandle then
   //  FreeLibrary(library_handle);
 
 end.

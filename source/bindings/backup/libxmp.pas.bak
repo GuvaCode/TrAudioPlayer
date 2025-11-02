@@ -371,7 +371,7 @@ xmp_smix_release_sample: function(ctx: xmp_context; num: Integer): Integer; cdec
 {Special function for dynamic loading of lib ...}
 
 procedure LoadXmpLib(const aLibName: string);
-
+function XmpLoaded: Boolean;
 implementation
 
 uses
@@ -443,11 +443,16 @@ LoadLibFn(xmp_smix_release_sample, 'xmp_smix_release_sample');
 {$pop}
 end;
 
+function XmpLoaded: Boolean;
+begin
+  Result := library_handle <> NilHandle;
+end;
+
 initialization
  // LoadLib(FindLibName(XMP_LIB_NAME));
 
 finalization
- // if library_handle <> NilHandle then
-  //  FreeLibrary(library_handle);
+  if library_handle <> NilHandle then
+    FreeLibrary(library_handle);
 
 end.

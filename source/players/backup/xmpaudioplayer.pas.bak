@@ -158,6 +158,9 @@ end;
 
 destructor TXmpAudioPlayer.Destroy;
 begin
+   StopAudioStream(FStream);
+//  SetAudioStreamCallback(FStream, @AudioCallback);
+  DetachAudioMixedProcessor(Self.FStream, @AudioProcessEqualizer);
   InternalStop;
   FreeModuleData;
   FPositionLock.Free;
@@ -181,7 +184,7 @@ begin
   FPlayers.Add(IntToStr(PtrInt(Self)), Self);
   SetAudioStreamVolume(FStream, 1.0);
   SetAudioStreamCallback(FStream, @AudioCallback);
- // AttachAudioStreamProcessor(FStream, @AudioProcessEqualizer);
+  AttachAudioStreamProcessor(FStream, @AudioProcessEqualizer);
 end;
 
 procedure TXmpAudioPlayer.LoadModuleFile(const MusicFile: string);
