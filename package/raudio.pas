@@ -9,8 +9,7 @@ interface
 
 uses
   rAudioPlayer, DefaultAudioPlayer, ZxTuneAudioPlayer, VgmAudioPlayer, 
-  OpenMptAudioPlayer, WavPackAudioPlayer, SndFileAudioPlayer, 
-  LazarusPackageIntf;
+  WavPackAudioPlayer, SndFileAudioPlayer, XmpAudioPlayer, LazarusPackageIntf;
 
 implementation
 

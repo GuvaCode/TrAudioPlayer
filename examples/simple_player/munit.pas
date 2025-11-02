@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ComCtrls,
-  ExtCtrls, ValEdit, rAudioPlayer, rAudioIntf;
+  ExtCtrls, rAudioPlayer, rAudioIntf;
 
 type
 
@@ -143,23 +143,20 @@ begin
   // This is important for the audio player to find the required DLLs/so files
 
   {$if defined(cpu64) and defined(windows)}
-    libPath := 'win64';  // 64-bit Windows
+   // libPath := 'win64';  // 64-bit Windows
+    libPath := '..\..\library\win64';  // 64-bit Windows
   {$endif}
-  {$if defined(cpu86) and defined(windows)}
-    libPath := '..\..\library\win32';  // 32-bit Windows
-  {$endif}
+
   {$if defined(cpu64) and defined(linux)}
     libPath := '../../library/lin64';  // 64-bit Linux
   {$endif}
-  {$if defined(cpu86) and defined(linux)}
-    libPath := '../../library/lin32';  // 32-bit Linux
-  {$endif}
+
 
   AudioPlayer.LibrariesPath := libPath;
 
   // Specify which audio libraries to use
   // These libraries support different audio formats
-  AudioPlayer.LibrariesUses := [lib_rAudio, lib_OpenMpt, lib_SndFile,
+  AudioPlayer.LibrariesUses := [lib_rAudio, lib_Xmp, lib_SndFile,
                                 lib_VgmPlay, lib_WavPack, lib_ZxTune];
 
   // Initialize the audio player and load all specified libraries

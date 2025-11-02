@@ -9,13 +9,13 @@ uses
   rAudioIntf, ctypes;
 
 type
-  TUsesLibs = (lib_rAudio, lib_ZxTune, lib_VgmPlay, lib_OpenMpt, lib_WavPack, lib_SndFile);
+  TUsesLibs = (lib_rAudio, lib_ZxTune, lib_VgmPlay, lib_Xmp, lib_WavPack, lib_SndFile);
   TUsesAudioLibs = set of TUsesLibs;
 
-  TPlayFormat = (play_MP3, play_WAV, play_QOA);
+  TPlayFormat = (play_MP3, play_WAV, play_QOA, play_OGG);
   TrAudioPlayFormat = set of TPlayFormat;
 
-  TPlayerType = (ptUnknown, ptDefault, ptZxTune, ptVgmPlay, ptOpenMpt, ptWavPack, ptSndFile);
+  TPlayerType = (ptUnknown, ptDefault, ptZxTune, ptVgmPlay, ptXmp, ptWavPack, ptSndFile);
 
   TPlayerTag = record
     PlayerType: TPlayerType;
@@ -61,7 +61,7 @@ type
     FDefaultPlayer: IMusicPlayer;
     FZxTunePlayer:  IMusicPlayer;
     FVGMPlayer:     IMusicPlayer;
-    FOpenMptPlayer: IMusicPlayer;
+    FXmpPlayer: IMusicPlayer;
     FWavPackPlayer: IMusicPlayer;
     FSndFilePlayer: IMusicPlayer;
     FCurrentPlayer: IMusicPlayer; // текущий плеер
@@ -97,12 +97,14 @@ type
     function GetVolume: Single;
 
     // Опредиляем тип плеера
+    function TestXMP(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
     function TestRAudio(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
     function TestSndFile(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
     function TestWavPack(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
-    function TestOpenMPT(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
+
     function TestVGM(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
     function TestZxTune(const MusicFile: string; var PlayerTag: TPlayerTag): Boolean;
+
 
     function DetectAudioFileType(const AFileName: string): TPlayerTag;
         // Методы для баланса
@@ -180,10 +182,10 @@ uses
   DefaultAudioPlayer,
   ZxTuneAudioPlayer,
   VgmAudioPlayer,
-  OpenMptAudioPlayer,
+  XmpAudioPlayer,
   WavPackAudioPlayer,
   SndFileAudioPlayer,
-  LResources, libzxtune, libvgmplay, libOpenMpt, libWavPack, libSndFile;
+  LResources, libzxtune, libvgmplay, libXmp, libWavPack, libSndFile;
 
 procedure Register;
 begin
@@ -199,7 +201,7 @@ begin
 
   // Инициализация свойств
   FLibrariesUses := cDefLibs;
-  FDefaultFormat := [play_MP3, play_WAV, play_QOA]; // Явно указываем значения
+  FDefaultFormat := [play_MP3, play_WAV, play_QOA, play_ogg]; // Явно указываем значения
   FVolume := 1.0;
   FTrackLoop := False;
   FCurrentTrack := 0;
@@ -265,10 +267,10 @@ begin
           FCurrentPlayer := FDefaultPlayer;
       end;
 
-    ptOpenMpt:
+    ptXmp:
       begin
-        if (lib_OpenMpt in FLibrariesUses) and Assigned(FOpenMptPlayer) then
-          FCurrentPlayer := FOpenMptPlayer
+        if (lib_Xmp in FLibrariesUses) and Assigned(FXmpPlayer) then
+          FCurrentPlayer := FXmpPlayer
         else
           FCurrentPlayer := FDefaultPlayer;
       end;
@@ -476,14 +478,14 @@ begin
     end;
   end;
 
-  if lib_OpenMpt in FLibrariesUses then
+  if lib_Xmp in FLibrariesUses then
   begin
-    LoadMptLib(FindLibName(FLibrariesPath, libopenmpt.library_name));
-    if not LibOpenMptLoaded then
+    LoadXmpLib(FindLibName(FLibrariesPath, libXmp.XMP_LIB_NAME));
+    if not XmpLoaded then
     begin
       if Assigned(FOnError) then
-        FOnError(Self, 'Failed to load OpenMPT library: ' + libopenmpt.library_name);
-      raise Exception.Create('Failed to load OpenMPT library: ' + libopenmpt.library_name);
+        FOnError(Self, 'Failed to load XMP library: ' + libXmp.XMP_LIB_NAME);
+      raise Exception.Create('Failed to load XMP library: ' + libXmp.XMP_LIB_NAME);
       Exit;
     end;
   end;
@@ -547,15 +549,15 @@ begin
     FVGMPlayer.OnLoad := @LoadHandleEvent;
   end;
 
-  if lib_OpenMpt in FLibrariesUses then
+  if lib_Xmp in FLibrariesUses then
   begin
-    FOpenMptPlayer := TOpenMPTAudioPlayer.Create;
-    FOpenMptPlayer.OnPlay := @PlayHandleEvent;
-    FOpenMptPlayer.OnStop := @StopHandleEvent;
-    FOpenMptPlayer.OnPause := @PauseHandleEvent;
-    FOpenMptPlayer.OnEnd := @EndHandleEvent;
-    FOpenMptPlayer.OnError := @ErrorHandleEvent;
-    FOpenMptPlayer.OnLoad := @LoadHandleEvent;
+    FXmpPlayer := TXmpAudioPlayer.Create;
+    FXmpPlayer.OnPlay := @PlayHandleEvent;
+    FXmpPlayer.OnStop := @StopHandleEvent;
+    FXmpPlayer.OnPause := @PauseHandleEvent;
+    FXmpPlayer.OnEnd := @EndHandleEvent;
+    FXmpPlayer.OnError := @ErrorHandleEvent;
+    FXmpPlayer.OnLoad := @LoadHandleEvent;
   end;
 
   if lib_WavPack in FLibrariesUses then
@@ -668,8 +670,8 @@ end;
 {$I includes/TestSndFile.inc}
 // Проверка WavPack
 {$I includes/TestWavPack.inc}
-// Проверка OpenMpt
-{$I includes/TestOpenMPT.inc}
+// Проверка Xmp
+{$I includes/TestXmp.inc}
 // Проверка VGM
 {$I includes/TestVgm.inc}
 // Проверка Zx Spectrum форматов
@@ -775,9 +777,9 @@ begin
         Exit;
     end;
 
-    if (lib_OpenMPT in FLibrariesUses) then
+    if (lib_Xmp in FLibrariesUses) then
     begin
-      if TestOpenMPT(AFileName, Result) then
+      if TestXmp(AFileName, Result) then
         Exit;
     end;
 
@@ -828,7 +830,7 @@ begin
     ptDefault:  Result := 'rAudio - Primary engine for basic formats';
     ptZxTune:   Result := 'ZXTune - Retro chiptune and console music';
     ptVgmPlay:  Result := 'VGMPlay - Arcade and console sound chips';
-    ptOpenMpt:  Result := 'OpenMPT - Amiga and DOS tracker modules';
+    ptXmp:      Result := 'Xmp - Amiga and DOS tracker modules';
     ptWavPack:  Result := 'WavPack - Hybrid lossless audio';
     ptSndFile:  Result := 'LibSndFile - Universal format support';
   else

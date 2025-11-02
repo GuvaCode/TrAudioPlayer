@@ -10,7 +10,7 @@ uses
 
 const
   {$IFDEF MSWINDOWS}
-  DEFAULT_LIB_NAME = 'wavpackdll.dll';
+  DEFAULT_LIB_NAME = 'libwavpack.dll';
   {$ELSE}
   {$IFDEF DARWIN}
   DEFAULT_LIB_NAME = 'libwavpack.dylib';

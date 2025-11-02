@@ -6,6 +6,7 @@
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
+        <IncludeFiles Value="../source/players"/>
         <OtherUnitFiles Value="../source;../source/players;../source/bindings"/>
         <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
@@ -29,16 +30,16 @@
         <UnitName Value="VgmAudioPlayer"/>
       </Item>
       <Item>
-        <Filename Value="../source/players/openmptaudioplayer.pas"/>
-        <UnitName Value="OpenMptAudioPlayer"/>
-      </Item>
-      <Item>
         <Filename Value="../source/players/wavpackaudioplayer.pas"/>
         <UnitName Value="WavPackAudioPlayer"/>
       </Item>
       <Item>
         <Filename Value="../source/players/sndfileaudioplayer.pas"/>
         <UnitName Value="SndFileAudioPlayer"/>
+      </Item>
+      <Item>
+        <Filename Value="../source/players/xmpaudioplayer.pas"/>
+        <UnitName Value="XmpAudioPlayer"/>
       </Item>
     </Files>
     <RequiredPkgs>

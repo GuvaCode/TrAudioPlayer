@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <Name Value="rAudio"/>
+    <Type Value="RunAndDesignTime"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <SearchPaths>
+        <IncludeFiles Value="../source/players"/>
+        <OtherUnitFiles Value="../source;../source/players;../source/bindings"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Files>
+      <Item>
+        <Filename Value="../source/raudioplayer.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="rAudioPlayer"/>
+      </Item>
+      <Item>
+        <Filename Value="../source/players/defaultaudioplayer.pas"/>
+        <UnitName Value="DefaultAudioPlayer"/>
+      </Item>
+      <Item>
+        <Filename Value="../source/players/zxtuneaudioplayer.pas"/>
+        <UnitName Value="ZxTuneAudioPlayer"/>
+      </Item>
+      <Item>
+        <Filename Value="../source/players/vgmaudioplayer.pas"/>
+        <UnitName Value="VgmAudioPlayer"/>
+      </Item>
+      <Item>
+        <Filename Value="../source/players/wavpackaudioplayer.pas"/>
+        <UnitName Value="WavPackAudioPlayer"/>
+      </Item>
+      <Item>
+        <Filename Value="../source/players/sndfileaudioplayer.pas"/>
+        <UnitName Value="SndFileAudioPlayer"/>
+      </Item>
+      <Item>
+        <Filename Value="../source/players/xmpaudioplayer"/>
+        <Type Value="Text"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="IDEIntf"/>
+      </Item>
+      <Item>
+        <PackageName Value="LCL"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>
