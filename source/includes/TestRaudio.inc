@@ -39,8 +39,18 @@ begin
             PlayerTag.System := 'MP3';
           end;
         end
-
-         // Quite OK Audio
+        // OGG: OggS
+        else if (Buffer[0] = $4F) and (Buffer[1] = $67) and  // Og
+                (Buffer[2] = $67) and (Buffer[3] = $53) then // gS
+        begin
+          if (play_OGG in FDefaultFormat) then
+          begin
+            Result := True;
+            PlayerTag.PlayerType := ptDefault;
+            PlayerTag.System := 'OGG';
+          end;
+        end
+        // Quite OK Audio
         else if ((Buffer[0] = $71) and (Buffer[1] = $6F) and (Buffer[2] = $61) and
                  (Buffer[3] = $66)) then  // The Quite OK Audio Format for Fast, Lossy Compression
         begin
@@ -51,8 +61,6 @@ begin
             PlayerTag.System := 'Quite OK Audio Format';
           end;
         end
-
-
       end;
     finally
       CloseFile(F);
@@ -60,4 +68,4 @@ begin
   except
     Result := False;
   end;
-end;  
+end;

@@ -201,7 +201,7 @@ begin
 
   // Инициализация свойств
   FLibrariesUses := cDefLibs;
-  FDefaultFormat := [play_MP3, play_WAV, play_QOA]; // Явно указываем значения
+  FDefaultFormat := [play_MP3, play_WAV, play_QOA, play_ogg]; // Явно указываем значения
   FVolume := 1.0;
   FTrackLoop := False;
   FCurrentTrack := 0;
