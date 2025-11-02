@@ -20,11 +20,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="mUnit"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="515"/>
-        <CursorPos X="61" Y="571"/>
+        <TopLine Value="4"/>
+        <CursorPos X="40" Y="57"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../test/unit1.pas"/>
@@ -36,27 +36,28 @@
       </Unit>
       <Unit>
         <Filename Value="../../source/bindings/libraudio.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="135"/>
-        <CursorPos X="3" Y="162"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="70"/>
         <UsageCount Value="18"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../source/raudioplayer.pas"/>
         <UnitName Value="rAudioPlayer"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="312"/>
-        <CursorPos X="3" Y="316"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="172"/>
+        <CursorPos X="3" Y="236"/>
         <UsageCount Value="26"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../source/raudiointf.pas"/>
         <UnitName Value="rAudioIntf"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="43"/>
-        <CursorPos X="5" Y="7"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="13"/>
+        <CursorPos X="28" Y="51"/>
         <UsageCount Value="18"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="/usr/share/lazarus/4.2.0/lcl/include/control.inc"/>
@@ -76,9 +77,11 @@
       <Unit>
         <Filename Value="../../source/players/defaultaudioplayer.pas"/>
         <UnitName Value="DefaultAudioPlayer"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="27" Y="19"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="58"/>
+        <CursorPos X="24" Y="219"/>
         <UsageCount Value="18"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../source/players/zxtuneaudioplayer.pas"/>
@@ -91,10 +94,9 @@
       <Unit>
         <Filename Value="../../source/players/vgmaudioplayer.pas"/>
         <UnitName Value="VgmAudioPlayer"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="538"/>
-        <CursorPos X="20" Y="542"/>
+        <EditorIndex Value="2"/>
         <UsageCount Value="17"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../source/players/openmptaudioplayer.pas"/>
@@ -139,7 +141,6 @@
         <TopLine Value="3"/>
         <CursorPos X="28" Y="13"/>
         <UsageCount Value="8"/>
-        <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit>
       <Unit>
         <Filename Value="/usr/share/fpcsrc/3.2.2/rtl/unix/aliasctp.inc"/>
@@ -168,7 +169,6 @@
         <TopLine Value="538"/>
         <CursorPos X="32" Y="552"/>
         <UsageCount Value="8"/>
-        <DefaultSyntaxHighlighter Value="C_2B_2B"/>
       </Unit>
       <Unit>
         <Filename Value="../../../../RayLib/26.09/26.09.25/src/external/miniaudio.h"/>
@@ -176,7 +176,6 @@
         <TopLine Value="9378"/>
         <CursorPos Y="9383"/>
         <UsageCount Value="8"/>
-        <DefaultSyntaxHighlighter Value="C_2B_2B"/>
       </Unit>
       <Unit>
         <Filename Value="../../../ray4laz/examples/audio/audio_equalizer/audio_equalizer.lpr"/>
@@ -196,11 +195,10 @@
       </Unit>
       <Unit>
         <Filename Value="../../source/bindings/libopenmpt.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1450"/>
         <CursorPos X="5" Y="1450"/>
         <UsageCount Value="19"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../source/includes/TestOpenMPT.inc"/>
@@ -232,48 +230,17 @@
         <CursorPos X="33" Y="34"/>
         <UsageCount Value="10"/>
       </Unit>
+      <Unit>
+        <Filename Value="../../source/bindings/libvgmplay.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="16"/>
+        <CursorPos X="35" Y="24"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="munit.pas"/>
-        <Caret Line="267" Column="11" TopLine="246"/>
-      </Position>
-      <Position>
-        <Filename Value="munit.pas"/>
-        <Caret Line="268" Column="11" TopLine="247"/>
-      </Position>
-      <Position>
-        <Filename Value="munit.pas"/>
-        <Caret Line="269" Column="11" TopLine="248"/>
-      </Position>
-      <Position>
-        <Filename Value="munit.pas"/>
-        <Caret Line="270" Column="11" TopLine="249"/>
-      </Position>
-      <Position>
-        <Filename Value="munit.pas"/>
-        <Caret Line="271" Column="11" TopLine="250"/>
-      </Position>
-      <Position>
-        <Filename Value="munit.pas"/>
-        <Caret Line="270" Column="55" TopLine="251"/>
-      </Position>
-      <Position>
-        <Filename Value="munit.pas"/>
-        <Caret Line="261" Column="37" TopLine="252"/>
-      </Position>
-      <Position>
-        <Filename Value="munit.pas"/>
-        <Caret Line="488" Column="30" TopLine="470"/>
-      </Position>
-      <Position>
-        <Filename Value="munit.pas"/>
-        <Caret Line="36" Column="27" TopLine="9"/>
-      </Position>
-      <Position>
-        <Filename Value="munit.pas"/>
-        <Caret Line="644" Column="5" TopLine="617"/>
-      </Position>
       <Position>
         <Filename Value="munit.pas"/>
         <Caret Line="96" Column="28" TopLine="83"/>
@@ -353,6 +320,45 @@
       <Position>
         <Filename Value="munit.pas"/>
         <Caret Line="359" Column="57" TopLine="344"/>
+      </Position>
+      <Position>
+        <Filename Value="munit.pas"/>
+        <Caret Line="163" Column="5" TopLine="155"/>
+      </Position>
+      <Position>
+        <Filename Value="munit.pas"/>
+        <Caret Line="525" Column="3" TopLine="522"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/raudioplayer.pas"/>
+        <Caret Line="120" Column="19" TopLine="109"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/raudioplayer.pas"/>
+        <Caret Line="306" Column="18" TopLine="169"/>
+      </Position>
+      <Position>
+        <Filename Value="munit.pas"/>
+        <Caret Line="525" Column="3" TopLine="522"/>
+      </Position>
+      <Position>
+        <Filename Value="munit.pas"/>
+        <Caret Line="498" Column="44" TopLine="487"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/raudioplayer.pas"/>
+        <Caret Line="119" Column="28" TopLine="108"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/defaultaudioplayer.pas"/>
+        <Caret Line="206" Column="34" TopLine="196"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/raudioplayer.pas"/>
+        <Caret Line="236" Column="3" TopLine="172"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
       </Position>
     </JumpHistory>
     <RunParams>

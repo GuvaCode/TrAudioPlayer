@@ -143,7 +143,7 @@ begin
   // This is important for the audio player to find the required DLLs/so files
 
   {$if defined(cpu64) and defined(windows)}
-    libPath := '..\..\library\win64';  // 64-bit Windows
+    libPath := 'win64';  // 64-bit Windows
   {$endif}
   {$if defined(cpu86) and defined(windows)}
     libPath := '..\..\library\win32';  // 32-bit Windows
