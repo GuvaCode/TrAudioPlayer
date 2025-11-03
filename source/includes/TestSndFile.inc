@@ -57,7 +57,7 @@ begin
     Exit;
 
   try
-    FillChar(FileInfo, SizeOf(FileInfo), 0);
+    FillChar(FileInfo{%H-}, SizeOf(FileInfo), 0);
     SndFile := sf_open(MusicFile, SFM_READ, FileInfo);
 
     if SndFile <> nil then
@@ -70,7 +70,7 @@ begin
         PlayerTag.Title := ExtractFileName(MusicFile);
 
         // Получаем информацию о формате - БЕЗОПАСНО
-        FillChar(FormatInfo, SizeOf(FormatInfo), 0);
+        FillChar(FormatInfo{%H-}, SizeOf(FormatInfo), 0);
         FormatInfo.format := FileInfo.format and SF_FORMAT_TYPEMASK;
 
         if sf_command_pointer(SndFile, SFC_GET_FORMAT_INFO, @FormatInfo, SizeOf(FormatInfo)) = 0 then

@@ -1,0 +1,530 @@
+unit DefaultAudioPlayer;
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils, libraudio,
+  rAudioIntf, contnrs, syncobjs, Math;
+
+type
+  { TDefaultAudioPlayer }
+  TDefaultAudioPlayer = class(TInterfacedObject, IMusicPlayer)
+  private
+    FStream: TAudioStream;
+    FMusic: TMusic;
+    FPlayerState: TPlayerState;
+    FFileName: String;
+    FTrackNumber: Integer;
+    FLoopMode: Boolean;
+
+    // Event fields
+    FOnPlay: TPlayEvent;
+    FOnPause: TPauseEvent;
+    FOnStop: TStopEvent;
+    FOnEnd: TEndEvent;
+    FOnError: TErrorEvent;
+    FOnLoad: TLoadEvent;
+
+    FPositionLock: TCriticalSection;
+
+    class var FPlayers: TFPHashList;
+    class var FCurrentPlayer: TDefaultAudioPlayer;
+
+    class constructor ClassCreate;
+    class destructor ClassDestroy;
+    procedure InitializeAudioStream;
+    class procedure AudioCallback({%H-}bufferData: pointer; {%H-}frames: LongWord); static; cdecl;
+
+
+    procedure CheckError(Success: Boolean; const Msg: string);
+    procedure CheckTrackEnd;
+
+    function GetPlayerState: TPlayerState;
+    function GetTrackNumber: Integer;
+    procedure SetTrackNumber(AValue: Integer);
+    function GetOnLoad: TLoadEvent;
+    procedure SetOnLoad(AEvent: TLoadEvent);
+
+    const
+      DEFAULT_FREQ = 44100;
+      DEFAULT_BITS = 16;
+      DEFAULT_CHANNELS = 2;
+      BUFFER_SIZE = 8192;
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    // Основные методы управления
+    procedure OpenMusicFile(const MusicFile: String);
+    procedure Play;
+    procedure PlayTrack(Track: Integer);
+    procedure Pause;
+    procedure Resume;
+    procedure Stop;
+
+    // Управление позицией
+    procedure SetPosition(PositionMs: Integer);
+    function GetPosition: Integer;
+    function GetDuration: Integer;
+
+    // Управление режимом повтора
+    procedure SetLoopMode(Mode: Boolean);
+    function GetLoopMode: Boolean;
+
+    // Состояние плеера
+    function IsPlaying: Boolean;
+    function IsPaused: Boolean;
+    function IsStopped: Boolean;
+    function GetState: TPlayerState;
+
+    // Информация о треке
+    function GetCurrentTrack: Integer;
+    function GetCurrentFile: String;
+    function GetTrackCount: Integer;
+
+    // Эквалайзер
+    procedure SetEqualizerBand(BandIndex: Integer; Gain: Single);
+    function GetEqualizerBand(BandIndex: Integer): Single;
+    procedure ResetEqualizer;
+
+    function GetBalance: Single;
+    procedure SetBalance(AValue: Single);
+
+
+    // События
+    function GetOnEnd: TEndEvent;
+    function GetOnError: TErrorEvent;
+    function GetOnPause: TPauseEvent;
+    function GetOnPlay: TPlayEvent;
+    function GetOnStop: TStopEvent;
+
+    procedure SetOnEnd(AEvent: TEndEvent);
+    procedure SetOnError(AEvent: TErrorEvent);
+    procedure SetOnPause(AEvent: TPauseEvent);
+    procedure SetOnPlay(AEvent: TPlayEvent);
+    procedure SetOnStop(AEvent: TStopEvent);
+
+    // Свойства
+    property TrackNumber: Integer read GetTrackNumber write SetTrackNumber;
+    property OnLoad: TLoadEvent read GetOnLoad write SetOnLoad;
+  end;
+
+implementation
+
+{ TDefaultAudioPlayer }
+
+class constructor TDefaultAudioPlayer.ClassCreate;
+begin
+  FPlayers := TFPHashList.Create;
+  FCurrentPlayer := nil;
+end;
+
+class destructor TDefaultAudioPlayer.ClassDestroy;
+begin
+  FPlayers.Free;
+end;
+
+procedure TDefaultAudioPlayer.CheckError(Success: Boolean; const Msg: string);
+begin
+  if not Success and Assigned(FOnError) then
+    FOnError(Self, Msg);
+end;
+
+procedure TDefaultAudioPlayer.CheckTrackEnd;
+begin
+  if not Assigned(FCurrentPlayer) then Exit;
+
+  StopAudioStream(FStream);
+  FPlayerState := psStopped;
+
+  if Assigned(FOnEnd) then
+    FOnEnd(Self, GetCurrentTrack, True);
+end;
+
+procedure TDefaultAudioPlayer.InitializeAudioStream;
+begin
+  SetAudioStreamBufferSizeDefault(BUFFER_SIZE);
+  FStream := LoadAudioStream(DEFAULT_FREQ, DEFAULT_BITS, DEFAULT_CHANNELS);
+  if IsAudioStreamReady(FStream) then
+  begin
+    FPlayers.Add(IntToStr(PtrInt(Self)), Self);
+    SetAudioStreamCallback(FStream, @AudioCallback);
+  end
+  else if Assigned(FOnError) then
+    FOnError(Self, 'Failed to initialize audio stream');
+end;
+
+class procedure TDefaultAudioPlayer.AudioCallback(bufferData: pointer; frames: LongWord); cdecl;
+begin
+  if Assigned(FCurrentPlayer) then
+  begin
+    FCurrentPlayer.FPositionLock.Enter;
+    try
+      UpdateMusicStream(FCurrentPlayer.FMusic);
+
+      if (not IsMusicStreamPlaying(FCurrentPlayer.FMusic)) and
+         (FCurrentPlayer.FPlayerState = psPlaying) and
+         (not FCurrentPlayer.FLoopMode) then
+        FCurrentPlayer.CheckTrackEnd;
+    finally
+      FCurrentPlayer.FPositionLock.Leave;
+    end;
+  end;
+end;
+
+constructor TDefaultAudioPlayer.Create;
+begin
+  inherited Create;
+
+  FPositionLock := TCriticalSection.Create;
+  InitializeAudioStream;
+
+  FPlayerState := psStopped;
+  FFileName := '';
+  FTrackNumber := 0;
+  FLoopMode := False;
+  FCurrentPlayer := Self;
+end;
+
+destructor TDefaultAudioPlayer.Destroy;
+begin
+  Stop;
+  FPlayers.Remove(Self);
+  if IsMusicReady(FMusic) then
+    UnloadMusicStream(FMusic);
+  if IsAudioStreamReady(FStream) then
+    UnloadAudioStream(FStream);
+  FPositionLock.Free;
+  inherited Destroy;
+end;
+
+procedure TDefaultAudioPlayer.OpenMusicFile(const MusicFile: String);
+var
+  TrackCount: Integer;
+begin
+  FPositionLock.Enter;
+  try
+    if not FileExists(MusicFile) then
+    begin
+      if Assigned(FOnError) then
+        FOnError(Self, 'File not found: ' + MusicFile);
+      Exit;
+    end;
+
+    Stop; // Остановить текущее воспроизведение
+
+    FMusic := LoadMusicStream(PChar(MusicFile));
+    if not IsMusicReady(FMusic) then
+    begin
+      if Assigned(FOnError) then
+        FOnError(Self, 'Failed to load music: ' + MusicFile);
+      Exit;
+    end;
+
+    FFileName := MusicFile;
+    FCurrentPlayer := Self;
+    FTrackNumber := 0; // Сброс номера трека
+    FPlayerState := psStopped;
+
+    // Определение количества треков (для совместимости)
+    TrackCount := GetTrackCount;
+
+    if Assigned(FOnLoad) then
+      FOnLoad(Self, MusicFile, TrackCount);
+
+  finally
+    FPositionLock.Leave;
+  end;
+end;
+
+procedure TDefaultAudioPlayer.Play;
+begin
+  FPositionLock.Enter;
+  try
+    if not IsMusicReady(FMusic) then
+    begin
+      if Assigned(FOnError) then
+        FOnError(Self, 'No music file loaded');
+      Exit;
+    end;
+
+    if FPlayerState = psPaused then
+    begin
+      ResumeMusicStream(FMusic);
+    end
+    else
+    begin
+      PlayMusicStream(FMusic);
+      FMusic.looping := FLoopMode;
+    end;
+
+    FPlayerState := psPlaying;
+    PlayAudioStream(FStream);
+
+    if Assigned(FOnPlay) then
+      FOnPlay(Self, FTrackNumber);
+
+  finally
+    FPositionLock.Leave;
+  end;
+end;
+
+procedure TDefaultAudioPlayer.PlayTrack(Track: Integer);
+begin
+  SetTrackNumber(Track);
+  Play;
+end;
+
+procedure TDefaultAudioPlayer.Pause;
+begin
+  FPositionLock.Enter;
+  try
+    if IsMusicStreamPlaying(FMusic) then
+    begin
+      PauseMusicStream(FMusic);
+      FPlayerState := psPaused;
+      if Assigned(FOnPause) then
+        FOnPause(Self, FTrackNumber);
+    end;
+  finally
+    FPositionLock.Leave;
+  end;
+end;
+
+procedure TDefaultAudioPlayer.Resume;
+begin
+  FPositionLock.Enter;
+  try
+    if (FPlayerState = psPaused) and IsMusicReady(FMusic) then
+    begin
+      ResumeMusicStream(FMusic);
+      FPlayerState := psPlaying;
+      PlayAudioStream(FStream);
+    end;
+  finally
+    FPositionLock.Leave;
+  end;
+end;
+
+procedure TDefaultAudioPlayer.Stop;
+begin
+  FPositionLock.Enter;
+  try
+    if IsMusicStreamPlaying(FMusic) then
+    begin
+      StopMusicStream(FMusic);
+      StopAudioStream(FStream);
+      FPlayerState := psStopped;
+
+      if Assigned(FOnStop) then
+        FOnStop(Self, FTrackNumber);
+    end;
+  finally
+    FPositionLock.Leave;
+  end;
+end;
+
+procedure TDefaultAudioPlayer.SetPosition(PositionMs: Integer);
+var
+  Seconds: Single;
+begin
+  FPositionLock.Enter;
+  try
+    if IsMusicReady(FMusic) then
+    begin
+      StopAudioStream(FStream);
+
+      Seconds := PositionMs / 1000;
+      if Seconds < 0 then Seconds := 0;
+      if Seconds > GetMusicTimeLength(FMusic) then
+        Seconds := GetMusicTimeLength(FMusic);
+
+      SeekMusicStream(FMusic, Seconds);
+
+      if FPlayerState = psPlaying then
+        PlayAudioStream(FStream);
+    end;
+  finally
+    FPositionLock.Leave;
+  end;
+end;
+
+function TDefaultAudioPlayer.GetPosition: Integer;
+begin
+  Result := 0;
+  if IsMusicReady(FMusic) then
+    Result := Trunc(GetMusicTimePlayed(FMusic) * 1000);
+end;
+
+function TDefaultAudioPlayer.GetDuration: Integer;
+begin
+  Result := 0;
+  if IsMusicReady(FMusic) then
+    Result := Trunc(GetMusicTimeLength(FMusic) * 1000);
+end;
+
+procedure TDefaultAudioPlayer.SetLoopMode(Mode: Boolean);
+begin
+  FLoopMode := Mode;
+  if IsMusicReady(FMusic) then
+    FMusic.looping := Mode;
+end;
+
+function TDefaultAudioPlayer.GetLoopMode: Boolean;
+begin
+  Result := FLoopMode;
+end;
+
+function TDefaultAudioPlayer.IsPlaying: Boolean;
+begin
+  Result := FPlayerState = psPlaying;
+end;
+
+function TDefaultAudioPlayer.IsPaused: Boolean;
+begin
+  Result := FPlayerState = psPaused;
+end;
+
+function TDefaultAudioPlayer.IsStopped: Boolean;
+begin
+  Result := FPlayerState = psStopped;
+end;
+
+function TDefaultAudioPlayer.GetState: TPlayerState;
+begin
+  Result := FPlayerState;
+end;
+
+function TDefaultAudioPlayer.GetCurrentTrack: Integer;
+begin
+  Result := FTrackNumber;
+end;
+
+function TDefaultAudioPlayer.GetCurrentFile: String;
+begin
+  Result := FFileName;
+end;
+
+function TDefaultAudioPlayer.GetTrackCount: Integer;
+begin
+  // Базовая реализация - всегда 1 трек
+  // Для форматов с несколькими треками нужно переопределить
+  Result := 1;
+end;
+
+
+procedure TDefaultAudioPlayer.SetEqualizerBand(BandIndex: Integer; Gain: Single
+  );
+begin
+
+end;
+
+function TDefaultAudioPlayer.GetEqualizerBand(BandIndex: Integer): Single;
+begin
+
+end;
+
+procedure TDefaultAudioPlayer.ResetEqualizer;
+begin
+
+end;
+
+function TDefaultAudioPlayer.GetBalance: Single;
+begin
+
+end;
+
+procedure TDefaultAudioPlayer.SetBalance(AValue: Single);
+begin
+
+end;
+
+function TDefaultAudioPlayer.GetOnEnd: TEndEvent;
+begin
+  Result := FOnEnd;
+end;
+
+function TDefaultAudioPlayer.GetOnError: TErrorEvent;
+begin
+  Result := FOnError;
+end;
+
+function TDefaultAudioPlayer.GetOnPause: TPauseEvent;
+begin
+  Result := FOnPause;
+end;
+
+function TDefaultAudioPlayer.GetOnPlay: TPlayEvent;
+begin
+  Result := FOnPlay;
+end;
+
+function TDefaultAudioPlayer.GetOnStop: TStopEvent;
+begin
+  Result := FOnStop;
+end;
+
+function TDefaultAudioPlayer.GetOnLoad: TLoadEvent;
+begin
+  Result := FOnLoad;
+end;
+
+procedure TDefaultAudioPlayer.SetOnEnd(AEvent: TEndEvent);
+begin
+  FOnEnd := AEvent;
+end;
+
+procedure TDefaultAudioPlayer.SetOnError(AEvent: TErrorEvent);
+begin
+  FOnError := AEvent;
+end;
+
+procedure TDefaultAudioPlayer.SetOnPause(AEvent: TPauseEvent);
+begin
+  FOnPause := AEvent;
+end;
+
+procedure TDefaultAudioPlayer.SetOnPlay(AEvent: TPlayEvent);
+begin
+  FOnPlay := AEvent;
+end;
+
+procedure TDefaultAudioPlayer.SetOnStop(AEvent: TStopEvent);
+begin
+  FOnStop := AEvent;
+end;
+
+procedure TDefaultAudioPlayer.SetOnLoad(AEvent: TLoadEvent);
+begin
+  FOnLoad := AEvent;
+end;
+
+function TDefaultAudioPlayer.GetPlayerState: TPlayerState;
+begin
+  Result := FPlayerState;
+end;
+
+function TDefaultAudioPlayer.GetTrackNumber: Integer;
+begin
+  Result := FTrackNumber;
+end;
+
+procedure TDefaultAudioPlayer.SetTrackNumber(AValue: Integer);
+begin
+  if FTrackNumber <> AValue then
+  begin
+    FTrackNumber := AValue;
+    // Здесь можно добавить логику переключения трека для мультитрековых форматов
+    if IsMusicReady(FMusic) and (FPlayerState = psPlaying) then
+    begin
+      // Перезапуск воспроизведения с новым треком
+      Stop;
+      Play;
+    end;
+  end;
+end;
+
+end.

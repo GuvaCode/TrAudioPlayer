@@ -36,9 +36,9 @@ begin
     end;
 
     // Инициализируем структуры
-    FillChar(TestInfo, SizeOf(TestInfo), 0);
-    FillChar(ModuleInfo, SizeOf(ModuleInfo), 0);
-    FillChar(FrameInfo, SizeOf(FrameInfo), 0);
+    FillChar(TestInfo{%H-}, SizeOf(TestInfo), 0);
+    FillChar(ModuleInfo{%H-}, SizeOf(ModuleInfo), 0);
+    FillChar(FrameInfo{%H-}, SizeOf(FrameInfo), 0);
 
     // Пытаемся протестировать XMP модуль
     Error := xmp_test_module_from_memory(FileData, FileSize, TestInfo);

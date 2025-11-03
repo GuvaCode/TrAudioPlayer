@@ -386,7 +386,7 @@ object Form1: TForm1
     end
   end
   object AudioPlayer: TrAudioPlayer
-    DefaultFormat = []
+    DefaultFormat = [play_MP3, play_WAV, play_QOA, play_OGG]
     OnPlay = AudioPlayerPlay
     OnPause = AudioPlayerPause
     OnStop = AudioPlayerStop

@@ -13,7 +13,7 @@ begin
     try
       if FileSize(F) > 11 then
       begin
-        BlockRead(F, Buffer, 12);
+        BlockRead(F, Buffer{%H-}, 12);
 
         // WAV: RIFF....WAVE
         if (Buffer[0] = $52) and (Buffer[1] = $49) and  // RI

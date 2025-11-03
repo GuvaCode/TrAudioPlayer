@@ -19,6 +19,7 @@ type
     FCurrentTrack: Integer;
     FTrackCount: Integer;
     FPositionLock: TCriticalSection;
+    FEqLock: TCriticalSection;
     FTrackEndTriggered: Boolean;
     FVGMHeader: VGM_HEADER;
     FVGMTag: VGM_TAG;
@@ -148,6 +149,8 @@ begin
   FCurrentTrack := 0;
   FTrackCount := 0; // VGM файлы обычно содержат один трек
   FPositionLock := TCriticalSection.Create;
+  FEqLock := TCriticalSection.Create;
+
   FBalance := 0.0;
   // Инициализируем структуры VGM
   FillChar(FVGMHeader, SizeOf(VGM_HEADER), 0);
@@ -162,6 +165,9 @@ begin
   InternalStop;
   FreeVGMData;
   FPositionLock.Free;
+  DetachAudioStreamProcessor(FStream, @AudioProcessEqualizer);
+  SetAudioStreamCallback(FStream, nil);
+  FEqLock.Free;
   inherited Destroy;
 end;
 
@@ -357,17 +363,33 @@ begin
   end;
 end;
 
-class procedure TVgmAudioPlayer.AudioProcessEqualizer(buffer: pointer;
-  frames: LongWord); cdecl;
-var
-  BufferData: PSingle;
-  frame: LongWord;
-  inputLeft, inputRight, outputLeft, outputRight: Single;
-  band: Integer;
-  leftGain, rightGain: Single;
-begin
-  if (FCurrentPlayer = nil) then Exit;
-  BufferData := PSingle(buffer);
+  class procedure TVgmAudioPlayer.AudioProcessEqualizer(buffer: pointer;
+    frames: LongWord); cdecl;
+  var
+    Current: TVgmAudioPlayer;
+    BufferData: PSingle;
+    frame, band: LongWord;
+    leftGain, rightGain: Single;
+    inputLeft, inputRight, outputLeft, outputRight: Single;
+  begin
+    // Быстрый выход, если ничего не проигрывается
+    if (FCurrentPlayer = nil) or (frames = 0) or (buffer = nil) then
+      Exit;
+
+
+
+    if Current = nil then
+      Exit;
+
+    // Проверка: не вышли ли мы за пределы BANDS_COUNT
+    if BANDS_COUNT <= 0 then
+      Exit;
+
+    FCurrentPlayer.FEqLock.Enter;
+     try
+
+    BufferData := PSingle(buffer);
+
 
   // Расчет коэффициентов усиления для баланса
   if FCurrentPlayer.FBalance < 0 then
@@ -417,6 +439,11 @@ begin
     BufferData[frame * 2] := outputLeft;
     BufferData[frame * 2 + 1] := outputRight;
   end;
+
+     finally
+       Current.FEqLock.Leave;
+   end;
+
 end;
 
 procedure TVgmAudioPlayer.CheckError(Condition: Boolean; const Msg: string);
@@ -695,7 +722,7 @@ begin
   end;
 
   // Инициализация истории фильтров
-  FillChar(FFilterHistory, SizeOf(FFilterHistory), 0);
+///  FillChar(FFilterHistory, SizeOf(FFilterHistory), 0);
 
   // Расчет начальных коэффициентов
   for i := 0 to BANDS_COUNT - 1 do
@@ -769,21 +796,27 @@ begin
   FCurrentTrack := AValue;
 end;
 
+
 procedure TVgmAudioPlayer.InitializeEqualizer;
 var
   i: Integer;
   freq: Single;
 begin
-  // Настройка частотных полос (октавные полосы)
-  freq := 32.0;
-  for i := 0 to BANDS_COUNT - 1 do
-  begin
-    FBands[i].Frequency := freq;
-    FBands[i].Gain := 0.0; // Нейтральное положение
-    FBands[i].Q := 1.0;    // Стандартная добротность
-    freq := freq * 2.0; // Октавное увеличение частоты
+  FEqLock.Enter;
+  try
+    freq := 32.0;
+    for i := 0 to BANDS_COUNT - 1 do
+    begin
+      FBands[i].Frequency := freq;
+      FBands[i].Gain := 0.0;
+      FBands[i].Q := 1.0;
+      freq := freq * 2.0;
+      CalculateFilterCoefficients(i);
+    end;
+    FillChar(FFilterHistory, SizeOf(FFilterHistory), 0);
+  finally
+    FEqLock.Leave;
   end;
-
 end;
 
 procedure TVgmAudioPlayer.CalculateFilterCoefficients(bandIndex: Integer);
@@ -793,11 +826,11 @@ var
   cosW0, sinW0: Single;
   coeffs: TFilterCoeffs;
 begin
-  band := FBands[bandIndex]; // Исправлено: FBands вместо Bands
+  band := FBands[bandIndex];
 
   // Преобразование dB в линейное значение
   A := Power(10.0, band.Gain / 40.0);
-  w0 := 2.0 * PI * band.Frequency / 44100; // Исправлено: SAMPLE_RATE вместо 44100
+  w0 := 2.0 * PI * band.Frequency / 44100;
   alpha := sin(w0) / (2.0 * band.Q);
 
   cosW0 := cos(w0);
@@ -821,12 +854,20 @@ begin
 
 end;
 
-function TVgmAudioPlayer.ApplyFilter(input: Single; bandIndex, channel: Integer
-  ): Single;
+function TVgmAudioPlayer.ApplyFilter(input: Single; bandIndex, channel: Integer): Single;
 var
   coeffs: TFilterCoeffs;
   output: Single;
 begin
+  // ИСПРАВЛЕННАЯ проверка границ
+  if (bandIndex < 0) or (bandIndex >= BANDS_COUNT) or
+     (channel < 0) or (channel > 1) then
+  begin
+    Result := input; // Возвращаем исходный сигнал при ошибке
+    Exit;
+  end;
+
+  // Безопасное получение коэффициентов
   coeffs := FFilterCoeffs[bandIndex];
 
   output := coeffs.a0 * input +
@@ -837,7 +878,7 @@ begin
 
   // Обновление истории
   FFilterHistory[bandIndex, channel, 1] := FFilterHistory[bandIndex, channel, 0];
-  FFilterHistory[bandIndex, channel, 0] := output;//input;
+  FFilterHistory[bandIndex, channel, 0] := output;
 
   Result := output;
 end;

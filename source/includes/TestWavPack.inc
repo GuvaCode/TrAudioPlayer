@@ -28,10 +28,10 @@ begin
       if FileStream.Size < 32 then
         Exit(False);
 
-      FileStream.Read(Header, SizeOf(Header));
+      FileStream.Read(Header{%H-}, SizeOf(Header));
 
       // Проверяем сигнатуру WavPack ("wvpk")
-      Move(Header[0], WavpackSig, 4);
+      Move(Header[0], WavpackSig{%H-}, 4);
       Result := (WavpackSig[0] = 'w') and
                 (WavpackSig[1] = 'v') and
                 (WavpackSig[2] = 'p') and

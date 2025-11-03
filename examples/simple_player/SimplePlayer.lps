@@ -11,7 +11,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="58"/>
+        <UsageCount Value="63"/>
       </Unit>
       <Unit>
         <Filename Value="munit.pas"/>
@@ -20,10 +20,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="mUnit"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="316"/>
+        <TopLine Value="141"/>
         <CursorPos X="2" Y="159"/>
-        <UsageCount Value="58"/>
+        <UsageCount Value="63"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -37,18 +36,19 @@
       </Unit>
       <Unit>
         <Filename Value="../../source/bindings/libraudio.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="152"/>
-        <CursorPos X="3" Y="165"/>
-        <UsageCount Value="20"/>
+        <EditorIndex Value="13"/>
+        <TopLine Value="121"/>
+        <CursorPos X="3" Y="133"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../source/raudioplayer.pas"/>
         <UnitName Value="rAudioPlayer"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="135"/>
-        <CursorPos X="53" Y="34"/>
-        <UsageCount Value="29"/>
+        <TopLine Value="4"/>
+        <CursorPos X="13" Y="9"/>
+        <UsageCount Value="30"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -69,18 +69,20 @@
       <Unit>
         <Filename Value="../../source/players/wavpackaudioplayer.pas"/>
         <UnitName Value="WavPackAudioPlayer"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="271"/>
-        <CursorPos Y="274"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="750"/>
+        <CursorPos Y="758"/>
         <UsageCount Value="19"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../source/players/defaultaudioplayer.pas"/>
         <UnitName Value="DefaultAudioPlayer"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="58"/>
-        <CursorPos X="24" Y="219"/>
-        <UsageCount Value="19"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="79"/>
+        <CursorPos X="36" Y="90"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../source/players/zxtuneaudioplayer.pas"/>
@@ -93,10 +95,12 @@
       <Unit>
         <Filename Value="../../source/players/vgmaudioplayer.pas"/>
         <UnitName Value="VgmAudioPlayer"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="727"/>
-        <CursorPos X="11" Y="870"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="428"/>
+        <CursorPos X="8" Y="445"/>
         <UsageCount Value="18"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../source/players/openmptaudioplayer.pas"/>
@@ -129,9 +133,10 @@
       </Unit>
       <Unit>
         <Filename Value="../../source/includes/TestRaudio.inc"/>
-        <EditorIndex Value="2"/>
-        <CursorPos X="32" Y="60"/>
-        <UsageCount Value="10"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="4"/>
+        <CursorPos X="33" Y="16"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -226,10 +231,11 @@
       </Unit>
       <Unit>
         <Filename Value="../../source/includes/TestWavPack.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="70"/>
-        <CursorPos X="15" Y="49"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="22"/>
+        <CursorPos X="38" Y="34"/>
         <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../source/bindings/libvgmplay.pas"/>
@@ -260,10 +266,11 @@
       <Unit>
         <Filename Value="../../source/players/xmpaudioplayer.pas"/>
         <UnitName Value="XmpAudioPlayer"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="207"/>
-        <CursorPos X="29" Y="163"/>
-        <UsageCount Value="11"/>
+        <EditorIndex Value="12"/>
+        <TopLine Value="296"/>
+        <CursorPos X="9" Y="259"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="../../../../Загрузки/rAudioClasses-main/src/raudiofiledetector.pas"/>
@@ -281,10 +288,11 @@
       </Unit>
       <Unit>
         <Filename Value="../../source/includes/TestXmp.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="78"/>
-        <CursorPos X="50" Y="90"/>
+        <EditorIndex Value="11"/>
+        <TopLine Value="27"/>
+        <CursorPos X="27" Y="39"/>
         <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="/usr/share/fpcsrc/3.2.2/rtl/inc/dynlibs.pas"/>
@@ -314,35 +322,188 @@
         <TopLine Value="73"/>
         <UsageCount Value="11"/>
       </Unit>
+      <Unit>
+        <Filename Value="../../../../.cache/.fr-DZ4CF3/delphi/BassTest/BTMain.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="149"/>
+        <CursorPos X="21" Y="266"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../../../Загрузки/UnRecord-main/lcl_uses/AccStreamPlayer/accstreamplayer.pas"/>
+        <UnitName Value="AccStreamPLayer"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="11"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../../../Загрузки/UnRecord-main/lcl_uses/AccStreamPlayer/aacplayer.pas"/>
+        <UnitName Value="AACPlayer"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="430"/>
+        <CursorPos Y="151"/>
+        <UsageCount Value="11"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../../../Загрузки/UnRecord-main/lcl_uses/AccStreamPlayer/bindings/binding.fdkaacdecoder.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="88"/>
+        <CursorPos X="3" Y="91"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../source/includes/TestSndFile.inc"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="61"/>
+        <CursorPos X="33" Y="73"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="/usr/share/lazarus/4.2.0/lcl/interfaces/gtk2/gtk2widgetset.inc"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="2608"/>
+        <CursorPos Y="2620"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="/usr/share/lazarus/4.2.0/lcl/interfaces/gtk2/gtk2proc.inc"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="4261"/>
+        <CursorPos Y="4272"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="/usr/share/fpcsrc/3.2.2/packages/fcl-base/src/contnrs.pp"/>
+        <UnitName Value="Contnrs"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="1401"/>
+        <CursorPos X="22" Y="1413"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="6">
+    <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="munit.pas"/>
-        <Caret Line="160" Column="4"/>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="468" Column="7" TopLine="453"/>
       </Position>
       <Position>
-        <Filename Value="../../source/raudioplayer.pas"/>
-        <Caret Line="668" Column="24" TopLine="659"/>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="37" Column="5" TopLine="26"/>
       </Position>
       <Position>
-        <Filename Value="../../source/includes/TestRaudio.inc"/>
-        <Caret Line="63" Column="9" TopLine="40"/>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="698" Column="4" TopLine="688"/>
       </Position>
       <Position>
-        <Filename Value="../../source/includes/TestRaudio.inc"/>
-        <Caret Line="11" Column="26"/>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="790" Column="3" TopLine="780"/>
       </Position>
       <Position>
-        <Filename Value="../../source/raudioplayer.pas"/>
-        <Caret Line="668" Column="24" TopLine="647"/>
+        <Filename Value="../../source/players/xmpaudioplayer.pas"/>
+        <Caret Line="350" TopLine="328"/>
       </Position>
       <Position>
-        <Filename Value="../../source/raudioplayer.pas"/>
-        <Caret Line="114" Column="23" TopLine="105"/>
+        <Filename Value="../../source/players/xmpaudioplayer.pas"/>
+        <Caret Line="79" Column="23" TopLine="73"/>
       </Position>
       <Position>
-        <Filename Value="../../source/raudioplayer.pas"/>
-        <Caret Line="200" Column="3" TopLine="200"/>
+        <Filename Value="../../source/players/xmpaudioplayer.pas"/>
+        <Caret Line="259" Column="9" TopLine="296"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="844" TopLine="820"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="48" Column="42" TopLine="35"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="362" TopLine="395"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="856" Column="16" TopLine="837"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="81" Column="23" TopLine="67"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="173" Column="3" TopLine="160"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="894" Column="23" TopLine="885"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="904" Column="28" TopLine="885"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Column="21"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="823" Column="5" TopLine="800"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="163" Column="22" TopLine="800"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="57" Column="14" TopLine="47"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="163" Column="22" TopLine="152"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="15" Column="5" TopLine="3"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="163" Column="22" TopLine="151"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="13" Column="3" TopLine="70"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="175" Column="45" TopLine="164"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="163" Column="22" TopLine="334"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="175" Column="43" TopLine="164"/>
+      </Position>
+      <Position>
+        <Filename Value="/usr/share/fpcsrc/3.2.2/packages/fcl-base/src/contnrs.pp"/>
+        <Caret Line="1413" Column="22" TopLine="1401"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="68" Column="35" TopLine="60"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="807" Column="39" TopLine="804"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="49" Column="42" TopLine="38"/>
       </Position>
     </JumpHistory>
     <RunParams>

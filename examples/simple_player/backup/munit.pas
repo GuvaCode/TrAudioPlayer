@@ -157,7 +157,7 @@ begin
   // Specify which audio libraries to use
   // These libraries support different audio formats
  // AudioPlayer.LibrariesUses := [lib_rAudio, lib_Xmp, lib_SndFile,
- //                               lib_VgmPlay, lib_WavPack, lib_ZxTune];
+ //                                lib_VgmPlay, lib_WavPack, lib_ZxTune];
 
   // Initialize the audio player and load all specified libraries
   // This must be called before any playback operations

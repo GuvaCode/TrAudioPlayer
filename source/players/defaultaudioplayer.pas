@@ -86,12 +86,12 @@ type
     function GetTrackCount: Integer;
 
     // Эквалайзер
-    procedure SetEqualizerBand(BandIndex: Integer; Gain: Single);
-    function GetEqualizerBand(BandIndex: Integer): Single;
+    procedure SetEqualizerBand({%H-}BandIndex: Integer; {%H-}Gain: Single);
+    function GetEqualizerBand({%H-}BandIndex: Integer): Single;
     procedure ResetEqualizer;
 
     function GetBalance: Single;
-    procedure SetBalance(AValue: Single);
+    procedure SetBalance({%H-}AValue: Single);
 
 
     // События
@@ -176,8 +176,6 @@ begin
 end;
 
 constructor TDefaultAudioPlayer.Create;
-var
-  i: integer;
 begin
   inherited Create;
 
@@ -424,9 +422,9 @@ begin
 
 end;
 
-function TDefaultAudioPlayer.GetEqualizerBand(BandIndex: Integer): Single;
+function TDefaultAudioPlayer.{%H-}GetEqualizerBand(BandIndex: Integer): Single;
 begin
-
+//
 end;
 
 procedure TDefaultAudioPlayer.ResetEqualizer;
@@ -434,7 +432,7 @@ begin
 
 end;
 
-function TDefaultAudioPlayer.GetBalance: Single;
+function TDefaultAudioPlayer.{%H-}GetBalance: Single;
 begin
 
 end;

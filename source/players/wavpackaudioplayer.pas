@@ -755,11 +755,17 @@ end;
 procedure TWavPackAudioPlayer.SetEqualizerBand(BandIndex: Integer; Gain: Single
   );
 begin
-  if (BandIndex >= 0) and (BandIndex < BANDS_COUNT) then
   begin
-    // Всегда сохраняем настройки
-    FBands[BandIndex].Gain := Max(-12.0, Min(12.0, Gain));
-    CalculateFilterCoefficients(BandIndex);
+    if (BandIndex >= 0) and (BandIndex < BANDS_COUNT) then
+    begin
+      FPositionLock.Enter;
+      try
+        FBands[BandIndex].Gain := Max(-12.0, Min(12.0, Gain));
+        CalculateFilterCoefficients(BandIndex);
+      finally
+        FPositionLock.Leave;
+      end;
+    end;
   end;
 end;
 
@@ -881,7 +887,7 @@ procedure TWavPackAudioPlayer.CalculateFilterCoefficients(bandIndex: Integer);
 var
   band: TEqualizerBand;
   A, w0, alpha: Single;
-  cosW0, sinW0: Single;
+  cosW0, {%H-}sinW0: Single;
   coeffs: TFilterCoeffs;
 begin
   band := FBands[bandIndex]; // Исправлено: FBands вместо Bands

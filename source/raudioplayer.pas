@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Controls, libraudio,
-  rAudioIntf, ctypes;
+  rAudioIntf;
 
 type
   TUsesLibs = (lib_rAudio, lib_ZxTune, lib_VgmPlay, lib_Xmp, lib_WavPack, lib_SndFile);

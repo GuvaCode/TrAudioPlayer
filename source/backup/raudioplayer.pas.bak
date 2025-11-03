@@ -31,7 +31,7 @@ type
 
 const
   cDefLibs = [lib_rAudio];
-  cDefPlay = [play_MP3, play_WAV, play_QOA];
+  cDefPlay = [play_MP3, play_WAV, play_QOA, play_OGG];
 
 type
   { TrAudioPlayer - компонент для воспроизведения аудио }

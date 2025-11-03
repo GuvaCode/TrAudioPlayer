@@ -160,10 +160,15 @@ destructor TXmpAudioPlayer.Destroy;
 begin
    StopAudioStream(FStream);
 //  SetAudioStreamCallback(FStream, @AudioCallback);
-  DetachAudioMixedProcessor(Self.FStream, @AudioProcessEqualizer);
+
   InternalStop;
   FreeModuleData;
+
+  DetachAudioMixedProcessor(@AudioProcessEqualizer);
+  SetAudioStreamCallback(FStream, nil);
   FPositionLock.Free;
+
+
 
   if FXmpContext <> nil then
   begin

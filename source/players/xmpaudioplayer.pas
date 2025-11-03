@@ -160,10 +160,15 @@ destructor TXmpAudioPlayer.Destroy;
 begin
    StopAudioStream(FStream);
 //  SetAudioStreamCallback(FStream, @AudioCallback);
-  DetachAudioMixedProcessor(@AudioProcessEqualizer);
+
   InternalStop;
   FreeModuleData;
+
+  DetachAudioMixedProcessor(@AudioProcessEqualizer);
+  SetAudioStreamCallback(FStream, nil);
   FPositionLock.Free;
+
+
 
   if FXmpContext <> nil then
   begin
@@ -236,58 +241,6 @@ begin
     xmp_restart_module(FXmpContext);
   end;
 end;
-{
-class procedure TXmpAudioPlayer.AudioCallback(bufferData: pointer; frames: LongWord); cdecl;
-var
-  SamplesRendered: Integer;
-  CurrentPosition: Integer;
-begin
-  if FCurrentPlayer = nil then Exit;
-
-  with FCurrentPlayer do
-  begin
-    FPositionLock.Enter;
-    try
-      if (FXmpContext = nil) or FIsPaused then
-      begin
-        FillChar(bufferData^, frames * DEFAULT_CHANNELS * (DEFAULT_BITS div 8), 0);
-        Exit;
-      end;
-
-      // Рендерим звук в буфер
-      SamplesRendered := xmp_play_buffer(
-        FXmpContext,
-        bufferData,
-        frames * DEFAULT_CHANNELS * (DEFAULT_BITS div 8),
-        Integer(FLoopMode)
-      );
-
-      // Проверяем окончание трека
-      xmp_get_frame_info(FXmpContext, FFrameInfo);
-      CurrentPosition := FFrameInfo.time;
-
-      if (SamplesRendered = 0) or (CurrentPosition >= FFrameInfo.total_time) then
-      begin
-        if Assigned(FOnEnd) and (not FLoopMode) then
-        begin
-          FOnEnd(FCurrentPlayer, FCurrentTrack, True);
-          FTrackEndTriggered := True;
-        end;
-
-        if FCurrentPlayer.GetLoopMode then
-        begin
-          ResetPlayback;
-          FTrackEndTriggered := False;
-        end;
-      end;
-
-    finally
-      FPositionLock.Leave;
-      if FTrackEndTriggered then InternalStop(True);
-    end;
-  end;
-end;
-}
 
 class procedure TXmpAudioPlayer.AudioCallback(bufferData: pointer; frames: LongWord); cdecl;
 var
