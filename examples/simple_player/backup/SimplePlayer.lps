@@ -22,7 +22,6 @@
         <UnitName Value="mUnit"/>
         <TopLine Value="141"/>
         <CursorPos X="2" Y="159"/>
-        <ComponentState Value="1"/>
         <UsageCount Value="63"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -98,8 +97,8 @@
         <UnitName Value="VgmAudioPlayer"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="178"/>
-        <CursorPos X="29" Y="193"/>
+        <TopLine Value="387"/>
+        <CursorPos X="63" Y="399"/>
         <UsageCount Value="18"/>
         <Loaded Value="True"/>
       </Unit>
@@ -387,34 +386,6 @@
     </Units>
     <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
-        <Caret Line="69" Column="26" TopLine="60"/>
-      </Position>
-      <Position>
-        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
-        <Caret Line="828" Column="37" TopLine="820"/>
-      </Position>
-      <Position>
-        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
-        <Caret Line="84" Column="28" TopLine="76"/>
-      </Position>
-      <Position>
-        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
-        <Caret Line="468" Column="7" TopLine="453"/>
-      </Position>
-      <Position>
-        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
-        <Caret Line="37" Column="5" TopLine="26"/>
-      </Position>
-      <Position>
-        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
-        <Caret Line="698" Column="4" TopLine="688"/>
-      </Position>
-      <Position>
-        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
-        <Caret Line="790" Column="3" TopLine="780"/>
-      </Position>
-      <Position>
         <Filename Value="../../source/players/xmpaudioplayer.pas"/>
         <Caret Line="350" TopLine="328"/>
       </Position>
@@ -505,6 +476,34 @@
       <Position>
         <Filename Value="/usr/share/fpcsrc/3.2.2/packages/fcl-base/src/contnrs.pp"/>
         <Caret Line="1413" Column="22" TopLine="1401"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="68" Column="35" TopLine="60"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="807" Column="39" TopLine="804"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="49" Column="42" TopLine="38"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="445" Column="8" TopLine="371"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="381" Column="5" TopLine="354"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="85" Column="28" TopLine="71"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="486" Column="67" TopLine="476"/>
       </Position>
     </JumpHistory>
     <RunParams>

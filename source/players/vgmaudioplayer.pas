@@ -366,7 +366,7 @@ end;
   class procedure TVgmAudioPlayer.AudioProcessEqualizer(buffer: pointer;
     frames: LongWord); cdecl;
   var
-    Current: TVgmAudioPlayer;
+
     BufferData: PSingle;
     frame, band: LongWord;
     leftGain, rightGain: Single;
@@ -377,16 +377,8 @@ end;
       Exit;
 
 
-
-    if Current = nil then
-      Exit;
-
-    // Проверка: не вышли ли мы за пределы BANDS_COUNT
-    if BANDS_COUNT <= 0 then
-      Exit;
-
     FCurrentPlayer.FEqLock.Enter;
-     try
+    try
 
     BufferData := PSingle(buffer);
 
@@ -441,7 +433,7 @@ end;
   end;
 
      finally
-       Current.FEqLock.Leave;
+       FCurrentPlayer.FEqLock.Leave;
    end;
 
 end;
@@ -489,10 +481,16 @@ begin
 
   FPositionLock.Enter;
   try
+  // Отключаем процессор на время загрузки
+
+
+      DetachAudioStreamProcessor(FStream, @AudioProcessEqualizer);
     // Останавливаем текущее воспроизведение
     if IsAudioStreamPlaying(FStream) then
+    begin
       InternalStop;
 
+    end;
     // Загружаем новый VGM файл
     try
       LoadVGMFile(MusicFile);

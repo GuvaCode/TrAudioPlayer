@@ -366,7 +366,7 @@ end;
   class procedure TVgmAudioPlayer.AudioProcessEqualizer(buffer: pointer;
     frames: LongWord); cdecl;
   var
-    Current: TVgmAudioPlayer;
+
     BufferData: PSingle;
     frame, band: LongWord;
     leftGain, rightGain: Single;
@@ -376,15 +376,9 @@ end;
     if (FCurrentPlayer = nil) or (frames = 0) or (buffer = nil) then
       Exit;
 
-    // Защита от use-after-free: сравниваем с активными плеерами (опционально)
-    // Или просто используем локальную копию
-    Current := FCurrentPlayer;
-    if Current = nil then
-      Exit;
 
-    // Проверка: не вышли ли мы за пределы BANDS_COUNT
-    if BANDS_COUNT <= 0 then
-      Exit;
+    FCurrentPlayer.FEqLock.Enter;
+    try
 
     BufferData := PSingle(buffer);
 
@@ -437,6 +431,11 @@ end;
     BufferData[frame * 2] := outputLeft;
     BufferData[frame * 2 + 1] := outputRight;
   end;
+
+     finally
+       FCurrentPlayer.FEqLock.Leave;
+   end;
+
 end;
 
 procedure TVgmAudioPlayer.CheckError(Condition: Boolean; const Msg: string);
@@ -482,6 +481,9 @@ begin
 
   FPositionLock.Enter;
   try
+  // Отключаем процессор на время загрузки
+    if Assigned(FStream) then
+      DetachAudioStreamProcessor(FStream, @AudioProcessEqualizer);
     // Останавливаем текущее воспроизведение
     if IsAudioStreamPlaying(FStream) then
       InternalStop;
@@ -788,26 +790,28 @@ procedure TVgmAudioPlayer.SetTrackNumber(AValue: Integer);
 begin
   FCurrentTrack := AValue;
 end;
+
+
 procedure TVgmAudioPlayer.InitializeEqualizer;
 var
   i: Integer;
   freq: Single;
 begin
-  // Настройка частотных полос (октавные полосы)
-  freq := 32.0;
-  for i := 0 to BANDS_COUNT - 1 do
-  begin
-    FBands[i].Frequency := freq;
-    FBands[i].Gain := 0.0; // Нейтральное положение
-    FBands[i].Q := 1.0;    // Стандартная добротность
-    freq := freq * 2.0; // Октавное увеличение частоты
-
-    // ВАЖНО: рассчитываем коэффициенты при инициализации
-    CalculateFilterCoefficients(i);
+  FEqLock.Enter;
+  try
+    freq := 32.0;
+    for i := 0 to BANDS_COUNT - 1 do
+    begin
+      FBands[i].Frequency := freq;
+      FBands[i].Gain := 0.0;
+      FBands[i].Q := 1.0;
+      freq := freq * 2.0;
+      CalculateFilterCoefficients(i);
+    end;
+    FillChar(FFilterHistory, SizeOf(FFilterHistory), 0);
+  finally
+    FEqLock.Leave;
   end;
-
-  // Инициализация истории фильтров
-//  FillChar(FFilterHistory, SizeOf(FFilterHistory), 0);
 end;
 
 procedure TVgmAudioPlayer.CalculateFilterCoefficients(bandIndex: Integer);

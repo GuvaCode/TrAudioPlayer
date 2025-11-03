@@ -39,7 +39,7 @@
         <EditorIndex Value="13"/>
         <TopLine Value="121"/>
         <CursorPos X="3" Y="133"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -48,7 +48,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="4"/>
         <CursorPos X="13" Y="9"/>
-        <UsageCount Value="30"/>
+        <UsageCount Value="31"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -72,7 +72,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="750"/>
         <CursorPos Y="758"/>
-        <UsageCount Value="19"/>
+        <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -81,7 +81,7 @@
         <EditorIndex Value="7"/>
         <TopLine Value="79"/>
         <CursorPos X="36" Y="90"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -97,9 +97,9 @@
         <UnitName Value="VgmAudioPlayer"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="428"/>
-        <CursorPos X="8" Y="445"/>
-        <UsageCount Value="18"/>
+        <TopLine Value="487"/>
+        <CursorPos X="26" Y="492"/>
+        <UsageCount Value="19"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -136,7 +136,7 @@
         <EditorIndex Value="8"/>
         <TopLine Value="4"/>
         <CursorPos X="33" Y="16"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -234,7 +234,7 @@
         <EditorIndex Value="10"/>
         <TopLine Value="22"/>
         <CursorPos X="38" Y="34"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -269,7 +269,7 @@
         <EditorIndex Value="12"/>
         <TopLine Value="296"/>
         <CursorPos X="9" Y="259"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -291,7 +291,7 @@
         <EditorIndex Value="11"/>
         <TopLine Value="27"/>
         <CursorPos X="27" Y="39"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -355,7 +355,7 @@
         <EditorIndex Value="9"/>
         <TopLine Value="61"/>
         <CursorPos X="33" Y="73"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -363,7 +363,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="2608"/>
         <CursorPos Y="2620"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -371,7 +371,7 @@
         <EditorIndex Value="6"/>
         <TopLine Value="4261"/>
         <CursorPos Y="4272"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -385,26 +385,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
-        <Caret Line="468" Column="7" TopLine="453"/>
-      </Position>
-      <Position>
-        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
-        <Caret Line="37" Column="5" TopLine="26"/>
-      </Position>
-      <Position>
-        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
-        <Caret Line="698" Column="4" TopLine="688"/>
-      </Position>
-      <Position>
-        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
-        <Caret Line="790" Column="3" TopLine="780"/>
-      </Position>
-      <Position>
-        <Filename Value="../../source/players/xmpaudioplayer.pas"/>
-        <Caret Line="350" TopLine="328"/>
-      </Position>
       <Position>
         <Filename Value="../../source/players/xmpaudioplayer.pas"/>
         <Caret Line="79" Column="23" TopLine="73"/>
@@ -504,6 +484,26 @@
       <Position>
         <Filename Value="../../source/players/vgmaudioplayer.pas"/>
         <Caret Line="49" Column="42" TopLine="38"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="445" Column="8" TopLine="371"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="381" Column="5" TopLine="354"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="85" Column="28" TopLine="71"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="486" Column="67" TopLine="476"/>
+      </Position>
+      <Position>
+        <Filename Value="../../source/players/vgmaudioplayer.pas"/>
+        <Caret Line="399" Column="63" TopLine="387"/>
       </Position>
     </JumpHistory>
     <RunParams>
